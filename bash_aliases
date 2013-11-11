@@ -118,20 +118,6 @@ alias iptstat='sudo iptables -L -v'
 alias iptsave='sudo /etc/init.d/iptables save'
 alias conntrack='sudo cat /proc/net/ip_conntrack'
 
-#'ssh'
-alias sshs100='ssh root@14.39.88.180'
-alias sship1101='ssh root@14.39.88.181'
-alias sshreschna='ssh -X user@14.39.88.131'
-alias sshreschna2='ssh -X user@14.39.88.132'
-alias sshlappy1='ssh -X user@14.39.88.141'
-alias sshlappy2='ssh -X user@14.39.88.142'
-alias sshlappy3='ssh -X user@14.39.88.143'
-alias sshsummit='ssh root@14.39.88.200'
-
-#'telnet'
-alias teldbox='telnet 14.39.88.182'
-alias telwlhdd='telnet 14.39.88.183'
-
 #pathes
 alias path='echo -e ${PATH//:/\\n}'
 alias libpath='echo -e ${LD_LIBRARY_PATH//:/\\n}'

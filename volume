@@ -1,0 +1,52 @@
+#!/bin/sh
+#
+# Set Audio-Volume and Notify
+# Author: Sven Sperner <cethss@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+if [ $# -gt 0 ]
+then
+	if [ $1 == '++' ]
+	then
+		amixer set Master 2+
+	fi
+	if [ $1 == '--' ]
+	then
+		amixer set Master 2-
+	fi
+else
+	echo $0 '<++/-->'
+	exit -1
+fi
+
+STATUS=$(amixer sget Master | awk '$1 == "Mono:" { print $NF; }')
+if [ $STATUS = '[off]' ]; then
+    VOLUME=MUTED
+    ICON=notification-audio-volume-muted
+else
+    VOLUME=$(amixer sget Master | sed '/^ *Mono: /{s/^.*\[\(.*\)%\].*/\1/;p;};d;')
+    if [ $VOLUME -eq 0 ]; then
+        ICON=/usr/share/icons/hydroxygen/48x48/status/newstyle-audio-volume-muted.png
+    elif [ $VOLUME -lt 33 ]; then
+        ICON=/usr/share/icons/hydroxygen/48x48/status/newstyle-audio-volume-low.png
+    elif [ $VOLUME -lt 66 ]; then
+        ICON=/usr/share/icons/hydroxygen/48x48/status/newstyle-audio-volume-medium.png
+    else
+        ICON=/usr/share/icons/hydroxygen/48x48/status/newstyle-audio-volume-high.png
+    fi
+    VOLUME="${VOLUME}%"
+fi
+
+/usr/bin/notify-send "Volume Control" "$VOLUME" -i "$ICON" -t 1500

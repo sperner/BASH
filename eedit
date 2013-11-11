@@ -1,0 +1,113 @@
+#!/bin/sh
+#
+# Edit Package-Configuration
+# Author: Sven Sperner <cethss@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+if [ $# -gt 0 ]
+then
+	case $1 in
+		"keywords")	sudo nano /etc/portage/package.keywords;;
+		"license")	sudo nano /etc/portage/package.license;;
+		"mask")		sudo nano /etc/portage/package.mask;;
+		"unmask")	sudo nano /etc/portage/package.unmask;;
+		"use")		sudo nano /etc/portage/package.use;;
+		"make")		sudo nano /etc/portage/make.conf;;
+		"distcc")	sudo nano /etc/distcc/hosts;;
+		"distccd")	sudo nano /etc/conf.d/distccd;;
+		"layman")	sudo nano /usr/local/portage/layman/make.conf;;
+		"laymancfg")	sudo nano /etc/layman/layman.cfg;;
+		"grub")		sudo mount /dev/sda1 /boot; sudo nano /boot/grub/grub.cfg; sudo umount /boot;;
+		"start")	sudo nano /etc/conf.d/local.start;;
+		"stop")		sudo nano /etc/conf.d/local.stop;;
+		"access")	sudo nano /etc/security/access.conf;;
+		"acpi")		sudo nano /etc/acpi/events/default;;
+		"bashrc")	sudo nano /etc/bash/bashrc;;
+		"capability")	sudo nano /etc/security/capability.conf;;
+		"cups")		sudo nano /etc/cups/printers.conf;;
+		"cupsd")	sudo nano /etc/cups/cupsd.conf;;
+		"cupspdf")	sudo nano /etc/cups/cups-pdf.conf;;
+		"fcron")	sudo nano /etc/fcron/fcron.conf;;
+		"fcrontab")	sudo nano /etc/fcron/fcrontab;;
+		"gitd")		sudo nano /etc/conf.d/git-daemon;;
+		"hcid")		sudo nano /etc/bluetooth/hcid.conf;;
+		"ld")		sudo nano /etc/ld.so.conf;;
+		"lirc")		sudo nano /etc/lircd.conf;;
+		"lircd")	sudo nano /etc/conf.d/lircd;;
+		"limits")	sudo nano /etc/security/limits.conf;;
+		"lmsensors")	sudo nano /etc/conf.d/lm_sensors;;
+		"microcode")	sudo nano /etc/conf.d/microcode_ctl;;
+		"minicom")	sudo nano /etc/minicom/minirc.dfl;;
+		"mysqld")	sudo nano /etc/mysql/my.cnf;;
+		"mysqlaccess")	sudo nano /etc/mysql/mysqlaccess.conf;;
+		"mythmysql")	nano ~/.mythtv/mysql.txt;;
+		"mythtv")	nano ~/.mythtv/config.xml;;
+		"namespace")	sudo nano /etc/security/namespace.conf;;
+		"ntpc")		sudo nano /etc/conf.d/ntp-client;;
+		"pamenv")	sudo nano /etc/security/pam_env.conf;;
+		"rc")		sudo nano /etc/conf.d/rc;;
+		"rconf")	sudo nano /etc/rc.conf;;
+		"rfcomm")	sudo nano /etc/bluetooth/rfcomm.conf;;
+		"smart")	sudo nano /etc/smartd.conf;;
+		"smartd")	sudo nano /etc/conf.d/smartd;;
+		"smb")		sudo nano /etc/samba/smb.conf;;
+		"smbusers")	sudo nano /etc/samba/smbusers;;
+		"ssh")		sudo nano /etc/ssh/ssh_config;;
+		"sshd")		sudo nano /etc/ssh/sshd_config;;
+		"svnd")		sudo nano /etc/conf.d/svnsvnserve;;
+		"syslog")	sudo nano /etc/conf.d/syslog-ng;;
+		"time")		sudo nano /etc/security/time.conf;;
+		"udev")		sudo nano /etc/udev/udev.conf/;;
+		"udevd")	sudo nano /etc/conf.d/udev;;
+		"useradd")	sudo nano /etc/default/useradd;;
+		"vdrremote")	sudo nano /etc/vdr/remote.conf;;
+		"vdrsetup")	sudo nano /etc/vdr/setup.conf;;
+		"world")	sudo nano /var/lib/portage/world;;
+		"xorg")		sudo nano /etc/X11/xorg.conf;;
+		*)		if [ -e /etc/$1 ]
+				then
+					sudo nano /etc/$1
+				else
+					if [ -e /etc/$1.conf ]
+					then
+						sudo nano /etc/$1.conf
+					else
+						if [ -e /etc/$1.cfg ]
+						then
+							sudo nano /etc/$1.cfg
+						else
+							if [ -e /etc/conf.d/$1 ]
+							then
+								sudo nano /etc/conf.d/$1
+							else
+								if [ -e /etc/conf.d/$1.conf ]
+								then
+									sudo nano /etc/conf.d/$1.conf
+								else
+									if [ -e /etc/conf.d/$1.cfg ]
+									then
+										sudo nano /etc/conf.d/$1.conf
+									else
+										echo 'Unknown config file:' $*
+									fi
+								fi
+							fi
+						fi
+					fi
+				fi
+	esac
+else
+	echo $0 '<keywords/license/mask/use/unmask/world/{conffile}>'
+fi

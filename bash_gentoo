@@ -1,0 +1,163 @@
+## Gentoo
+# Author: Sven Sperner <cethss@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+#Variables
+ekey='ACCEPT_KEYWORDS="~x86"'
+CORES=${CORES:-3}
+
+#Aliases
+alias eall="sudo emerge -av --update --deep --newuse --with-bdeps=y @system @world"
+alias ebelong="equery belongs"
+alias echeck="equery check"
+alias echanges="equery changes"
+alias eclean="sudo emerge -av --clean"
+alias econfig="sudo emerge -av --config"
+alias edepclean="sudo emerge --ask --deep --depclean"
+alias edepends="equery depends"
+alias edepgraph="equery depgraph"
+alias edeselect="sudo emerge -av --deselect"
+alias eetcup="sudo etc-update"
+alias efiles="equery files"
+alias glsa="sudo glsa-check -p affected"
+alias ehasuse="equery hasuse"
+alias einstall="sudo emerge --ask --verbose --noreplace"
+alias eixi="eix --installed"
+alias eixo="eix --only-names"
+alias eixio="eix --only-names --installed"
+alias elop="genlop"
+alias emodreb="sudo module-rebuild rebuild"
+alias enewuse="sudo emerge -av --deep --newuse"
+alias eoneshot="sudo emerge -av --oneshot"
+alias epeek="cd /; portpeek -c --all"
+alias eperl="sudo perl-cleaner all"
+alias epreserved="sudo emerge -av @preserved-rebuild"
+alias epython="sudo python-updater"
+alias ereinstall="sudo emerge -av"
+alias erevdep="sudo revdep-rebuild -- -av"
+alias esearch="sudo emerge --search"
+alias esize="equery size"
+alias eskip="sudo emerge --resume --skip-first"
+alias esync="sudo layman -s ALL && sudo eix-sync"
+alias eunmask="sudo autounmask"
+alias eupdate="sudo emerge -av --update"
+alias eupdeep="sudo emerge -av --update --deep"
+alias eupnew="sudo emerge -av --update --deep --newuse"
+alias euses="equery uses"
+alias unmerge="sudo emerge -av --unmerge"
+
+#Functions
+emanifest()
+{
+	if [ $# -eq 1 ]
+	then
+		sudo ebuild $1 manifest
+	else
+		echo "Manifest an (new/edited) eBuild"
+		echo -e "${GREEN}usage:${BLUE} emanifest() <Path2eBuild>"
+	fi
+}
+
+#elafix()
+#{
+#	[ $# -gt 0 ] && echo "Checking for broken la-Librarys and Repairing"
+#	sudo lafilefixer --justfixit | while read LINE; do
+#		echo $LINE | grep updating || echo -n .
+#	done
+#	echo; echo done...
+#}
+
+emake()
+{
+	if [ $# -gt 0 ]
+	then
+		if [ $1 == 'system' ]
+		then
+			#sudo emerge --emptytree --ask --verbose --quiet --jobs=$CORES --accept-properties=-interactive system
+			sudo emerge --emptytree --ask --verbose --quiet --jobs=$CORES --accept-properties=-interactive @system
+		fi
+		if [ $1 == 'world' ]
+		then
+			#sudo emerge --emptytree --ask --verbose --quiet --jobs=$CORES --accept-properties=-interactive world
+			sudo emerge --emptytree --ask --verbose --quiet --jobs=$CORES --accept-properties=-interactive @world
+		fi
+		if [ $1 == 'all' ]
+		then
+			#sudo emerge --emptytree --ask --verbose --quiet --jobs=$CORES --accept-properties=-interactive system world
+			sudo emerge --emptytree --ask --verbose --quiet --jobs=$CORES --accept-properties=-interactive @system @world
+		fi
+	else
+		echo "Rebuild the System/World/both"
+		echo -e "${GREEN}usage:${BLUE} emake()${blue} [system/world/all]"
+	fi
+}
+
+efullupdate()
+{
+	[ $# -gt 0 ] && echo "Full System Update with Overlay & Portage-Tree synchronisation, System-Upgrade & -New-Use, Dependency-Clean, fix Library-Links" && return 1
+
+	#Synchronisation
+	sudo layman -s ALL
+	sudo eix-sync
+	
+	#upgrade System
+	#sudo emerge --verbose --quiet --jobs=$CORES --keep-going --update --deep --newuse system world
+	sudo emerge --verbose --quiet --jobs=$CORES --keep-going --update --deep --newuse @system @world
+	
+	#clean Unneeded
+	sudo emerge --verbose --quiet --keep-going --deep --depclean
+	
+	#fix Librarys
+	sudo lafilefixer --justfixit
+	sudo revdep-rebuild -- --verbose --quiet --jobs=$CORES --keep-going
+	
+	#merge Preserved
+	#sudo emerge --verbose --quiet --jobs=$CORES --keep-going  @preserved-rebuild
+	
+	#update Configs
+	sudo etc-update
+}
+
+eresume()
+{
+	if [ $# -gt 0 ]
+	then
+		if [ $1 == 'clean' ]
+		then
+			LIMIT=$[`resumeedit|wc -l`-1]
+			REDIT=$(locate -r resumeedit$|head -1)
+
+			[[ $REDIT != *resumeedit ]] && echo "Command 'resumeedit' not found" && return
+			
+			for (( i=1; i<=$LIMIT; i++ ))
+			do
+				sudo $REDIT -d 1
+			done
+
+			echo "Resumelist cleaned"
+		else
+			if [ $1 == 'help' ]
+			then
+				echo "Resume/clean last eMerge-Process"
+				echo -e "${GREEN}usage:${BLUE} eresume() [<emerge-options>|clean]"
+			else
+				sudo emerge --resume $*
+			fi
+		fi
+	else
+		sudo emerge --resume
+	fi
+}
+

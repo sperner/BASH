@@ -1,0 +1,29 @@
+# Author: Sven Sperner <cethss@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+echo -e "\033[2J"
+echo -e "\033[H"
+#echo -e "\033[0;37m        $(date "+%A, %d-%m-%Y - %T %Z")"
+echo -e "\033[0;35m                                           . "
+echo -e "\033[0;35m     .vir.                                d8b                             \033[1;30m -------------------------------------------------"
+echo -e "\033[0;35m  .d8The88b.    .cd88b.     .d88b.   d8latest8di8b  .d88b.      .d88b.    \033[1;30m|\033[0m OS:       \033[1;35m Gentoo\033[1;34m $(uname -s)"
+echo -e "\033[0;35m  8str( )os8b d8se()em8.   d8ed8to8b Q8be8jusPt8aP.8bunch8b.  .8of8theb.  \033[1;30m|\033[0m Kernel:   \033[1;37m $(uname -r)"
+echo -e "\033[0;35m  Q8same8old8B8stuff88P\"  d8noPQ8th8b.   8ing.   .8neP' \`8w8 .8noP' \`888  \033[1;30m|\033[0m Processor:\033[1;37m $(uname -p|sed 's/Genuine //g')"
+echo -e "\033[0;35m    \"8thing8P Q8innov8b  d8a8P   Qtiveb  8.Thb   8en8b..d8I8 8tr8b..died  \033[1;30m|\033[0m Memory:   \033[1;37m $(cat /proc/meminfo | grep MemTotal | cut -d\  -f "9,10")"
+echo -e "\033[0;35m   dGentooP\"   \"8Linux88 Q8I8     Q8wa8  8s8i8   \`Q8mpressP  \`Q8ed.8I8P   \033[1;30m|\033[0m Terminal: \033[1;37m $(tty)"
+echo -e "\033[0;35m  8found8P       \`\"\"\"\"\"   \"\"        \"\"   Q8i8P     \"Q8t8P\"     \"Q8!8P\"    \033[1;30m|\033[0m Hostname: \033[1;32m $(hostname)"
+echo -e "\033[0;35m  \`Q88P\"                                  \"\"\""
+echo -e "\033[0;34m                     All of the sudden, I was in control. And I liked it!"
+echo -e "\033[0m"

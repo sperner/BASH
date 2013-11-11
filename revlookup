@@ -1,0 +1,60 @@
+#!/bin/sh
+#
+# DNS Reverse-Lookup
+# Author: Sven Sperner <cethss@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+IsNumeric(){ 
+  case $1 in 
+         '') return 1;; # an empty entry 
+  *[!0-9,]*) return 1;; # invalid chars in the entry 
+   *[!0-9]*) return 1;; # all commas so invalid 
+       *,,*) return 1;; # consecutive commas so invalid 
+         ,*) return 1;; # entry begins with a , so invalid ? 
+          *) return 0;; # valid entry 
+  esac 
+} 
+
+if [ $# -gt 0 ]
+then
+	DIGIT1=$(echo $1 | cut -d "." -f 1)
+	DIGIT2=$(echo $1 | cut -d "." -f 2)
+	DIGIT3=$(echo $1 | cut -d "." -f 3)
+	DIGIT4=$(echo $1 | cut -d "." -f 4)
+
+	#if [ $DIGIT1 -ge 0 ] && [ $DIGIT2 -ge 0 ] && [ $DIGIT3 -ge 0 ] && [ $DIGIT4 -ge 0 ]
+	if IsNumeric $DIGIT1 && IsNumeric $DIGIT2 && IsNumeric $DIGIT3 && IsNumeric $DIGIT4
+	then
+		echo "Got an IP-Address: $1"
+	else
+		ADDRESS=$(host $1 | grep -v alias | head -1 | cut -d " " -f 4)
+		echo "Got a Hostname: $1 at Address: $ADDRESS"
+		DIGIT1=$(echo $ADDRESS | cut -d "." -f 1)
+		DIGIT2=$(echo $ADDRESS | cut -d "." -f 2)
+		DIGIT3=$(echo $ADDRESS | cut -d "." -f 3)
+		DIGIT4=$(echo $ADDRESS | cut -d "." -f 4)
+	fi
+
+	echo "set type=PTR" > /tmp/revlook.tmp
+	echo "Set Lookup-Type to PTR"
+	echo "$DIGIT4.$DIGIT3.$DIGIT2.$DIGIT1.in-addr.arpa" >> /tmp/revlook.tmp
+	echo "Using Address: $DIGIT4.$DIGIT3.$DIGIT2.$DIGIT1.in-addr.arpa"
+	echo
+	echo "NSLookup says..."
+
+	nslookup < /tmp/revlook.tmp
+else
+	echo $0 '<ip-address/hostname>'
+fi

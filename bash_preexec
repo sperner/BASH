@@ -1,0 +1,119 @@
+# bash_preexec -- Bash support for ZSH-like 'preexec' and 'precmd' functions
+
+# 'preexec()' is executed before each interactive command
+# 'precmd()' is executed before each prompt is displayed
+
+# usage [dynamic xterm title]
+#  1. source this file (source ~/.bash_preexec)
+#  2. define 'preexec' and/or 'precmd', AFTER sourcing this file
+#  3. near the end of '.bashrc', run 'preexec_install'
+# [3. after 'preexec_install', run 'preexec_xterm_title_install']
+#
+
+
+preexec_interactive_mode=""
+
+# default do-nothing implementation of precmd
+function precmd () {
+	true
+}
+
+function preexec_invoke_cmd () {
+	precmd
+	preexec_interactive_mode="yes"
+}
+
+# default do-nothing implementation of preexec
+function preexec () {
+	true
+}
+
+function preexec_invoke_exec () {
+	if [[ -n "$COMP_LINE" ]]
+	then	# Completer-Line
+		return
+	fi
+	if [[ -z "$preexec_interactive_mode" ]]
+	then	# Let the prompt set the title
+		return
+	else	# SubShell
+		if [[ 0 -eq "$BASH_SUBSHELL" ]]
+		then
+			preexec_interactive_mode=""
+		fi
+	fi
+	if [[ "preexec_invoke_cmd" == "$BASH_COMMAND" ]]
+	then
+		preexec_interactive_mode=""
+		return
+	fi
+	local command=`history 1 | sed -e "s/^[ ]*[0-9]*[ ]*//g"`;
+	preexec "$command"
+}
+
+
+# install preexec/precmd
+function preexec_install () {
+	set -o functrace > /dev/null 2>&1
+	shopt -s extdebug > /dev/null 2>&1
+	PROMPT_COMMAND="${PROMPT_COMMAND};preexec_invoke_cmd"
+	trap 'preexec_invoke_exec' DEBUG
+}
+
+function preexec_uninstall() {
+	#set -o functrace > /dev/null 2>&1
+	shopt -u extdebug > /dev/null 2>&1
+        PROMPT_COMMAND=$(echo $PROMPT_COMMAND|sed 's/;preexec_invoke_cmd//g')
+	trap - DEBUG
+}
+
+
+# change xterm title
+function preexec_xterm_title () {
+	echo -ne "\033]0;$1\007" > /dev/stderr
+}
+
+# change screen title
+function preexec_screen_title () {
+	echo -ne "\033k$1\033\\" > /dev/stderr
+}
+
+# display user@host
+function preexec_screen_user_at_host () {
+	echo -n "${USER}@${HOSTNAME%%.*}"
+}
+
+
+# dynamic xterm title
+function preexec_xterm_title_install ()
+{
+    function precmd () {
+        preexec_xterm_title "${TERM} - ${USER}@${HOSTNAME%%.*}:#: `dirs -0` $PROMPTCHAR"
+        if [[ "${TERM}" == screen ]]
+        then
+            preexec_screen_title "`preexec_screen_user_at_host`${PROMPTCHAR}"
+        fi
+    }
+
+    function preexec () {
+        preexec_xterm_title "${TERM} -#- $1 {`dirs -0`} (${USER}@${HOSTNAME%%.*})"
+        if [[ "${TERM}" == screen ]]
+        then
+            local cutit="$1"
+            local cmdtitle=`echo "$cutit" | cut -d " " -f 1`
+            if [[ "$cmdtitle" == "exec" ]]
+            then
+                local cmdtitle=`echo "$cutit" | cut -d " " -f 2`
+            fi
+            if [[ "$cmdtitle" == "screen" ]]
+            then
+                local cmdtitle="${PROMPTCHAR}"
+            else
+                local cmdtitle=":$cmdtitle"
+            fi
+            preexec_screen_title "`preexec_screen_user_at_host`${PROMPTCHAR}$cmdtitle"
+        fi
+    }
+
+    preexec_install
+}

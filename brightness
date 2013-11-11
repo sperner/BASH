@@ -1,0 +1,63 @@
+#!/bin/sh
+#
+# Change brightness of a Lenovo u350 display
+# Author: Sven Sperner <cethss@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+ADRESS=$(lspci | grep VGA | cut -d' ' -f1)
+let CURRENT=0x$(setpci -s $ADRESS F4.B)
+ICON=/usr/share/icons/hicolor/scalable/status/xfpm-brightness-lcd.svg
+
+if [ $# -gt 0 ]
+then
+	if [ $1 == '++' ]
+	then
+#		if [ $CURRENT -lt 206 ]
+#		then
+#			VALUE=$[CURRENT+50]
+#		else
+#			VAL=255
+#		fi
+		case $CURRENT in
+			[0-4])			VALUE=$[CURRENT+1];;	# 0-4
+                        [5-9]|[1-4][0-9])       VALUE=$[CURRENT+4];;	# 5-49
+			[5-9][0-9])		VALUE=$[CURRENT+8];;	# 50-99
+			1[0-9][0-9])		VALUE=$[CURRENT+12];;	# 100-199
+			2[0-2][0-9]|23[0-9])	VALUE=$[CURRENT+16];;	# 200-239
+			*)			VALUE=255;;		# else
+		esac
+	fi
+	if [ $1 == '--' ]
+	then
+#		if [ $CURRENT -gt 50  ]
+#		then
+#			VALUE=$[CURRENT-50]
+#		else
+#			VALUE=1
+#		fi
+                case $CURRENT in
+			[1-5])			VALUE=$[CURRENT-1];;	# 1-5
+			[6-9]|[1-4][0-9])	VALUE=$[CURRENT-4];;	# 6-49
+			[5-9][0-9])		VALUE=$[CURRENT-8];;	# 50-99
+			1[0-9][0-9])		VALUE=$[CURRENT-12];;	# 100-199
+			[2-9][0-9][0-9])	VALUE=$[CURRENT-16];;	# 200-999
+			*)			VALUE=1;;		# else
+		esac
+	fi
+	gksu -u $(who|grep tty -m1|cut -d" " -f1) "/usr/bin/notify-send 'Brightness Control' 0x$VALUE -i $ICON -t 1500"
+	setpci -s $ADRESS F4.B=$(printf "%02x\n" $VALUE)
+else
+	setpci -s $ADRESS F4.B=30
+fi

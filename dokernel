@@ -1,0 +1,87 @@
+#!/bin/sh
+#
+# Configure, build & install Linux kernel
+# Author: Sven Sperner <cethss@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+CORES=6
+
+BLUE="\e[1;34m"
+blue="\e[0;34m"
+RED="\e[1;31m"
+nocol="\e[0m"
+
+
+while [ -z $confopt ]
+do
+	echo -e "${RED}Do you want to configure the kernel? (y/n)"
+	read confopt
+	echo -e
+done
+
+echo -e "${blue}Mounting the boot partition${nocol}"
+sudo mount ${1:-/dev/sda1} /boot || exit 1 && echo -e "${BLUE}OK"
+
+
+echo -e "${BLUE}Configuring the kernel"
+make oldconfig || exit 1 && echo -e "${blue}OK"
+
+if [ $confopt == 'y' ]
+then
+	echo -e "${BLUE}Staring manual Configuration"
+	make menuconfig || exit 1 && echo -e "${blue}OK"
+fi
+
+
+echo -e "${BLUE}Building the kernel"
+make -j$[CORES+1] || exit 1 echo -e "${blue}OK"
+
+echo -e "${BLUE}Installing the modules"
+sudo make modules_install || exit 1 && echo -e "${blue}OK"
+
+echo -e "${BLUE}Installing the kernel"
+sudo make install || exit 1 && echo -e "${blue}OK"
+
+
+echo -e "${BLUE}Saving old GRUB config"
+mv /boot/grub/grub.conf /boot/grub/grub.conf.old || exit 1 && echo -e "${blue}OK"
+
+echo -e "${BLUE}Changing GRUB config"
+MAJOR=$(sed -n '/^VERSION = /{ s@VERSION = @@p; q; }' Makefile)
+MINOR=$(sed -n '/^PATCHLEVEL = /{ s@PATCHLEVEL = @@p; q; }' Makefile)
+SUBLV=$(sed -n '/^SUBLEVEL = /{ s@SUBLEVEL = @@p; q; }' Makefile)
+EXTRA=$(sed -n '/^EXTRAVERSION = /{ s@EXTRAVERSION = @@p; q; }' Makefile)
+if [ -f ".config" ]; then
+        LOCAL=$(sed -n '/^CONFIG_LOCALVERSION=/{ s@CONFIG_LOCALVERSION=@@p; q; }' .config|sed 's/\"//g')
+fi
+FULL=${MAJOR}.${MINOR}.${SUBLV}${EXTRA}${LOCAL}
+TITLE=$(cat /boot/grub/grub.conf.old | grep title -m1 -A3 | head -1)
+ROOT=$(cat /boot/grub/grub.conf.old | grep title -m1 -A3 | head -2 | tail -1)
+KERN=$(cat /boot/grub/grub.conf.old | grep title -m1 -A3 | head -3 | tail -1)
+cat /boot/grub/grub.conf.old | while IFS= read LINE; do
+	echo "$LINE" >> /boot/grub/grub.conf
+	if echo $LINE | grep '#KCONFS'; then
+		echo >> /boot/grub/grub.conf
+		echo $TITLE | sed s/$(uname -r|cut -d\- -f1)/$(echo $FULL|cut -d\- -f1)/g >> /boot/grub/grub.conf
+		echo $ROOT >> /boot/grub/grub.conf
+		echo $KERN | sed s/$(uname -r)/$FULL/g >> /boot/grub/grub.conf
+	fi
+done
+
+
+echo -e "${BLUE}Unmounting the boot partition"
+umount /boot || exit 1 && echo -e "${blue}OK"
+
+

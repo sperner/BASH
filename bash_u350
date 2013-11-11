@@ -322,7 +322,7 @@ watchvdr()
 	then
 		mplayer http://$VDRADDR:3000/PES/$1
 	else
-                        echo -e "Watch TV via Strem from S100/VDR"
+                        echo -e "Watch TV via Strem from VDR"
                         echo -e "${BLUE}usage:${blue} watchvdr() <ChannelNo>"
 	fi
 }
@@ -456,7 +456,7 @@ vboxmods()
 
 ## SSH/SCP... Functions
 alias vdrmount="mountsshfs root@$VDRADDR:/"
-alias vdrmountstuff="mountsshfs $VDRUSER@$VDRADDR:/home/s100/stuff"
+alias vdrmountstuff="mountsshfs $VDRUSER@$VDRADDR:/home/$VDRUSER/stuff"
 
 serverdo()
 {
@@ -542,7 +542,7 @@ vdrstuff()
                 echo -e "${BLUE}usage:${blue} vdrstuff() <dest:[games|movies|music|pictures|video]> <file1> <file2> ... "
 	fi
 	shift
-	scp ${1+"$@"} $VDRUSER@$VDRADDR:/home/s100/stuff/$FOLDER/
+	scp ${1+"$@"} $VDRUSER@$VDRADDR:/home/$VDRUSER/stuff/$FOLDER/
 }
 
 

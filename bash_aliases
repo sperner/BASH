@@ -102,6 +102,7 @@ alias open='kfmclient exec'
 #listings
 alias lsofn='lsof | awk "!/^\$/ && /\// { print \$9 }" | sort -u'
 alias lsofip='lsof -i'
+alias lsusbn='lsusb 2>&1 | grep -v "libusb: debug"'
 
 #links
 alias linksfb='links -driver fb'

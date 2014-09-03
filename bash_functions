@@ -95,9 +95,14 @@ start()
 		echo -e "Start a Daemon via Initscript"
 		echo -e "${RED}usage:${BLUE} start() <scriptname>" && return;
 	fi
-	for arg in $*; do
-		sudo /etc/init.d/$arg start;
-	done
+	if [ -f /etc/init.d/$1 ]
+	then
+		for arg in $*; do
+			sudo /etc/init.d/$arg start;
+		done
+	else
+		echo "$0: $1 is not an init script"
+	fi
 }
 
 stop()
@@ -106,9 +111,14 @@ stop()
 		echo -e "Stop a Daemon via Initscript"
 		echo -e "${RED}usage:${BLUE} stop() <scriptname>" && return;
 	fi
-	for arg in $*; do
-		sudo /etc/init.d/$arg stop;
-	done
+	if [ -f /etc/init.d/$1 ]
+	then
+		for arg in $*; do
+			sudo /etc/init.d/$arg stop;
+		done
+	else
+		echo "$0: $1 is not an init script"
+	fi
 }
 
 restart()
@@ -117,9 +127,14 @@ restart()
 		echo -e "Restart a Daemon via Initscript"
 		echo -e "${RED}usage:${BLUE} restart() <scriptname>" && return;
 	fi
-	for arg in $*; do
-		sudo /etc/init.d/$arg restart;
-	done
+	if [ -f /etc/init.d/$1 ]
+	then
+		for arg in $*; do
+			sudo /etc/init.d/$arg restart;
+		done
+	else
+		echo "$0: $1 is not an init script"
+	fi
 }
 
 reload()
@@ -128,9 +143,14 @@ reload()
 		echo -e "Reload Configuration of a Daemon via Initscript"
 		echo -e "${RED}usage:${BLUE} reload() <scriptname>" && return;
 	fi
-	for arg in $*; do
-		sudo /etc/init.d/$arg reload;
-	done
+	if [ -f /etc/init.d/$1 ]
+	then
+		for arg in $*; do
+			sudo /etc/init.d/$arg reload;
+		done
+	else
+		echo "$0: $1 is not an init script"
+	fi
 }
 
 status()
@@ -139,9 +159,14 @@ status()
 		echo -e "Show status of a Daemon via Initscript"
 		echo -e "${RED}usage:${BLUE} status() <scriptname>" && return;
 	fi
-	for arg in $*; do
-		sudo /etc/init.d/$arg status;
-	done
+	if [ -f /etc/init.d/$1 ]
+	then
+		for arg in $*; do
+			sudo /etc/init.d/$arg status;
+		done
+	else
+		echo "$0: $1 is not an init script"
+	fi
 }
 
 
@@ -241,7 +266,7 @@ runs()
 {
 	if [ $# -gt 0 ]
 	then
-		ps -elf | grep -v grep | grep $1
+		ps -elf | grep -v grep | grep -i $1
 	else
 		echo -e "Does a given process run?"
 		echo -e "${RED}usage:${BLUE} runs()${blue} [<string>]"
@@ -320,14 +345,8 @@ lsofp()
 		echo -e "Find file(s) opened by process"
 		echo -e "${RED}usage:${BLUE} lsofp() <processname>" && return;
 	fi
-	for ((i=2;i<=5;i++));
-	do
-		PID=`ps -e|grep -i " ${1:-init}"|cut -d\  -f$i`
-		if [ $PID -ge 1 ] 2>/dev/null; then
-			break
-		fi	
-	done
-	lsof +p $PID|sort -k 9
+
+	lsof +p `pidof $1`|sort -k 9
 }
 
 lsofu()
@@ -336,17 +355,8 @@ lsofu()
 		echo -e "List usage of files used by process"
 		echo -e "${RED}usage:${BLUE} lsofu() <processname>" && return;
 	fi
-	for ((i=2;i<=5;i++));
-	do
-		PID=`ps -e|grep -i " ${1:-init}"|cut -d\  -f$i`
-		if [ $PID -gt 0 ] 2>/dev/null; then
-			echo "got pid $PID"
-			break
-		else
-			echo "no pid at $i"
-		fi
-	done
-	strace -e trace=file -p $PID
+
+	strace -e trace=file -p `pidof $1`
 }
 
 fls()
@@ -774,6 +784,45 @@ corename()
 	for file ; do
 		echo -n $file : ; gdb --core=$file --batch | head -1
 	done 
+}
+
+
+
+### Begin functions other people wrote
+
+# sudo wrapper
+function exesudo ()
+{
+    local _funcname_="$1"
+    local params=( "$@" )               ## array containing all params passed here
+    local tmpfile="/dev/shm/$RANDOM"    ## temporary file
+    local filecontent                   ## content of the temporary file
+    local regex                         ## regular expression
+    local func                          ## function source
+
+    unset params[0]              ## remove first element
+
+    content="#!/bin/bash\n\n"
+    content="${content}params=(\n"
+
+    regex="\s+"
+    for param in "${params[@]}"
+    do
+        if [[ "$param" =~ $regex ]]
+            then
+                content="${content}\t\"${param}\"\n"
+            else
+                content="${content}\t${param}\n"
+        fi
+    done
+
+    content="$content)\n"
+    echo -e "$content" > "$tmpfile"
+    echo "#$( type "$_funcname_" )" >> "$tmpfile"
+    echo -e "\n$_funcname_ \"\${params[@]}\"\n" >> "$tmpfile"
+
+    sudo bash "$tmpfile"
+    rm -f "$tmpfile"
 }
 
 

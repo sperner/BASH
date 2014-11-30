@@ -1,0 +1,528 @@
+## u350
+# Author: Sven Sperner <cethss@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+## spec's
+CORES=$(expr $(cat /proc/cpuinfo|grep processor|tail -1|cut -d\  -f2) + 1)
+TFTRES=1366x768
+CAMRES=640x480
+CAMDEV=/dev/video0
+
+HOMENET=
+HOMEMASK=
+VDRADDR=
+VDRUSER=
+SERVERADDR=
+SERVERUSER=
+
+## CPU
+cpuset()
+{
+	if [ $# -gt 0 ]
+	then
+		MIN=$(cpupower -c 0,1 frequency-info|grep Grenzen|head -1|cut -d\  -f7)
+		MAX=$(cpupower -c 0,1 frequency-info|grep Grenzen|head -1|cut -d\  -f10)
+		[[ $(echo $MAX|grep '\.') ]]; MAX=$(echo $MAX|sed 's/\.//')0
+		[[ $(cat /sys/class/power_supply/BAT1/present) ]]; GOV=ondemand : GOV=powersave
+		for ((NUM=0 ; NUM<=$CORES ; NUM++ )); do
+			sudo cpupower frequency-info -g ${1:-$GOV} --min ${2:-$MIN}MHz --max ${3:-$MAX}MHz -c $NUM
+		done
+	else
+                echo -e "Set the CPU-Frequency Governor"
+                echo -e "${BLUE}usage:${blue} cpuset() [powersave|ondemand|performance] [MIN MAX (MHz)]"
+	fi
+}
+
+cpuinfo()
+{
+	if [ $# -eq 0 ]; then
+	        TEMP=$(cpupower -c 0,1 frequency-info|egrep "CPU |Der Regler|Taktfrequenz ist"|sed 's/analysiere //g' \
+			| sed 's/liegen. Der Regler "//g' | sed 's/" kann frei entscheiden,/ ->/g' \
+			| sed 's/momentane Taktfrequenz ist//g')
+	        echo $TEMP | sed 's/\. /\n/g' | sed 's/ ist /=/g' | sed 's/MHz./MHz/g'
+	else
+		cpupower -c 0,1 frequency-info | egrep "analysiere|momentane|Regler" | sed "s/,//g" | sed "s/und/-/g" \
+	        | sed "s/die Frequenz soll innerhalb//g" | sed "s/liegen.//g" #| sed "s/\.//g"
+	fi
+}
+
+
+
+## ethernet
+alias scanlocal='nmap localhost -p0-65535'
+alias scanhome='nmap $HOMENET/$HOMEMASK -sP'
+
+ether2wlan()
+{
+	sudo /etc/init.d/net.eth0 stop
+	sudo /etc/init.d/net.wlan0 restart || sudo /etc/init.d/net.wlan0 start
+}
+
+wlan2ether()
+{
+	sudo /etc/init.d/net.wlan0 stop
+	sudo /etc/init.d/net.eth0 start
+}
+
+
+
+## wireless
+alias wpaping='sudo wpa_cli ping'
+alias wpastat='sudo wpa_cli status'
+alias wpascan='sudo wpa_cli scan && sudo wpa_cli scan_result'
+alias wpaautopower='sudo iwconfig wlan0 txpower auto'
+
+wpaswitch()
+{
+	if [ $# -gt 0 ]
+	then
+		if [ $1 == "home" ]
+		then
+			sudo cp /etc/conf.d/net.home /etc/conf.d/net
+			sudo cp /etc/wpa_supplicant/wpa_supplicant.conf.home /etc/wpa_supplicant/wpa_supplicant.conf
+		fi
+		if [ $1 == "fh" ]
+		then
+			sudo cp /etc/conf.d/net.school /etc/conf.d/net
+			sudo cp /etc/wpa_supplicant/wpa_supplicant.conf.school /etc/wpa_supplicant/wpa_supplicant.conf
+			echo "now enter your password into the config-file..."
+			sleep 1
+			sudo nano /etc/wpa_supplicant/wpa_supplicant.conf
+		fi
+		if [ $1 == "open" ]
+		then
+                        sudo cp /etc/conf.d/net.open /etc/conf.d/net
+                        sudo cp /etc/wpa_supplicant/wpa_supplicant.conf.open /etc/wpa_supplicant/wpa_supplicant.conf
+		fi
+	else
+		echo $0 '<home/fh>'
+	fi
+}
+
+
+
+## Bluetooth
+alias bluebind='rfcomm bind'
+alias bluebrowse='sdptool browse'
+alias bluecmd='hcitool cmd'
+alias bluecon='hcitool con'
+alias bluedev='hcitool dev'
+alias bluedown='hciconfig down'
+alias blueinq='hcitool inq'
+alias bluelescan='hcitool lescan'
+alias bluefwup='dfutool upgrade'
+alias bluerecord='sdptool records'
+alias bluereset='hciconfig reset'
+alias bluescan='hcitool scan'
+alias bluesearch='sdptool search'
+alias blueshow='rfcomm show'
+alias blueup='hciconfig up'
+
+blueconnect()
+{
+	if [ $# -gt 0 ]
+	then
+		address=$(hcitool scan | grep $1 | sed '{s/'$1'//g;s/\t//g;}')
+		hcitool cc $address
+	fi
+}
+
+blueinfo()
+{
+	if [ $# -gt 0 ]
+	then
+		address=$(hcitool scan | grep $1 | sed '{s/'$1'//g;s/\t//g;}')
+		hcitool name $address
+		hcitool info $address
+		hcitool rssi $address
+		hcitool lq $address
+		hcitool afh $address
+		hcitool tpl $address
+		rfcomm show $address
+	else
+		echo -e "Information about a Bluetooth-Device"
+		echo -e "${BLUE}usage:${blue} blueinfo() <DeviceName>"
+		echo -e "${nocol}"
+		hciconfig oobdata
+		hciconfig commands
+		hciconfig features
+		hciconfig version
+		hciconfig revision
+	fi
+}
+
+bluemount()
+{
+	if [ $# -gt 0 ]
+	then
+		address=$(hcitool scan | grep $1 | sed '{s/'$1'//g;s/\t//g;}')
+		obexfs -b $address /media/blue
+	else
+		echo -e "Connect to Bluetooth-Device and Mount MassStorage"
+		echo -e "${BLUE}usage:${blue} bluemount() <DeviceName>"
+	fi
+}
+
+blueping()
+{
+	if [ $# -gt 0 ]
+	then
+		address=$(hcitool scan | grep $1 | sed '{s/'$1'//g;s/\t//g;}')
+		l2ping -i $address -c 3
+	else
+		echo -e "L2CAP Ping"
+		echo -e "${BLUE}usage:${blue} blueping() <DeviceName>"
+	fi
+}
+
+
+
+## ffmpeg
+alias ffmpeg_audiovideo='ffmpeg -f video4linux2 -s $CAMRES -i $CAMDEV -ar 48000 -f oss -i /dev/dsp -f mpegts -vcodec mpeg4 udp:yoda:1234'
+alias ffmpeg_snapshot='ffmpeg -f video4linux2 -s $CAMRES -r 1 -i $CAMDEV -f image2 image.jpg'
+alias ffmpeg_videoshot='ffmpeg -f video4linux2 -s $CAMRES -r 20 -i $CAMDEV -an -f avi video.avi'
+alias ffmpeg_x11audio='ffmpeg -f x11grab -s $TFTRES -i 0:0 -ar 48000 -f oss -i /dev/audio x11audio.mpg'
+alias ffmpeg_x11grab='ffmpeg -f x11grab -s cif -i 0:0 x11.mpg'
+
+demux()
+{
+	if [ $# -gt 0 ]
+	then
+		AFORMAT=$(ffmpeg -i $1 2>&1|grep Stream|grep Audio|cut -d\  -f8|sed 's/,//g')
+		case $AFORMAT in
+			aac)			AEND=$AFORMAT	;;
+			ac3)			AEND=$AFORMAT	;;
+			mp2)			AEND=$AFORMAT	;;
+			mp3|mpg3|mpeg3)		AEND=mp3	;;
+			ogg|vorbis)		AEND=ogg	;;
+			wav)			AEND=$AFORMAT	;;
+			wma)			AEND=$AFORMAT	;;
+			*)	echo new audio codec _"$AFORMAT"_ && return 1
+		esac
+		VFORMAT=$(ffmpeg -i $1 2>&1|grep Stream|grep Video|cut -d\  -f8|sed 's/,//g')
+		case $VFORMAT in
+			avi|divx|xvid)			VEND=$VFORMAT	;;
+			flv|vp6f|vp7f|vp8f|vp9f)	VEND=rawflv	;;
+			mjpeg|mjpg)			VEND=mjpg	;;
+			mpg|mpeg|mpegvideo)		VEND=mpv	;;
+			mpg2|mp2|mpeg2|mpeg2video)	VEND=m2v	;;
+			mpg4|mp4|mpeg4|mpeg4video)	VEND=m4v	;;
+			vfw|wmv|wmv2)			VEND=wmv	;;
+			vp3)				VEND=$VFORMAT	;;
+			*)	echo new video codec _"$VFORMAT"_ && return 1
+		esac
+	        ffmpeg -i $1 -vcodec copy -f rawvideo $1.$VEND -acodec copy $1.$AEND
+	else
+		echo -e "Split Movie into seperate Audio-/Video-Files"
+		echo -e "${BLUE}usage:${blue} demux() <Moviefile>"
+	fi
+}
+
+remux()
+{
+	if [ $# -lt 3 ]
+	then
+		echo -e "Combine Audio-/Video-Files into a Moviefile"
+		echo -e "${BLUE}usage:${blue} remux() <videofile> <audiofile> <outfile>"
+	else
+		ffmpeg -i $1 -vcodec copy -i $2 -acodec copy $3
+	fi
+}
+
+normux()
+{
+	if [ $# -gt 0 ]
+	then
+		mp3gain -p -r -k -d 1 $1
+		normalize $1
+	else
+		echo -e "Normalize the amplitude of any audiofile"
+		echo -e "${BLUE}usage:${blue} remux() <audiofile>"
+	fi
+}
+
+
+
+## mplayer
+mplfbcon()
+{
+	if [ $# -gt 0 ]
+	then
+		if [ $1 -eq "*.asx" ]
+		then
+			mplayer -vo fbdev -fs -vf scale=800:600 -playlist $1
+		else
+			mplayer -vo fbdev -fs -vf scale=800:600 $1
+		fi
+	else
+		echo -e "Play Mediafile in FramBuffer-Console"
+		echo -e "${BLUE}usage:${blue} mplfbcon() <File2Play>"
+	fi
+}
+
+mpluvc()
+{
+	if [ $# -eq 0 ]
+	then
+		mplayer -tv driver=v4l2:device=/dev/video0 tv://
+	fi
+	if [ $# -eq 1 ]
+	then
+		if [ $1 == 'fb' ]
+		then
+			mplayer -vo fbdev -fs -vf scale=1024:768 -tv driver=v4l2:device=/dev/video0 tv://
+		else
+			if [ $1 == 'fb2' ]
+			then
+				mplayer -vo fbdev2 -fs -vf scale=1024:768 -tv driver=v4l2:device=/dev/video0 tv://
+			else
+				if [ $1 == 'caca' ]
+				then
+					mplayer -vo caca -fs -tv driver=v4l2:device=/dev/video0 tv://
+				else
+					echo -e "Grab Video from Video4Linux-Device"
+					echo -e "${BLUE}usage:${blue} mpluvc() [fb|fb2|caca]"
+				fi
+			fi
+		fi
+	fi
+}
+
+mencuvc()
+{
+	if [ $# -eq 1 ]
+	then
+		mencoder tv:// -tv driver=v4l2:width=640:height=480:device=/dev/video0:forceaudio:alsa -ovc lavc -oac mp3lame -o "$1"
+	else
+		if [ $# -eq 2 ]
+		then
+			mencoder tv:// -tv driver=v4l2:width=640:height=480:device="$2":forceaudio:alsa -ovc lavc -oac mp3lame -o "$1"
+		else
+			echo -e "Grab and Save Video from Video4Linux-Device"
+			echo -e "${BLUE}usage:${blue} mencuvc() <File2Save2> [<Video-Device>]"
+		fi
+	fi
+}
+
+watchvdr()
+{
+	if [ $# -gt 0 ]
+	then
+		mplayer http://$VDRADDR:3000/PES/$1
+	else
+                        echo -e "Watch TV via Strem from VDR"
+                        echo -e "${BLUE}usage:${blue} watchvdr() <ChannelNo>"
+	fi
+}
+
+
+
+## xwinwrap
+xwwcam()
+{
+	if [ $# -eq 0 ]
+	then
+		xwinwrap -ni -fs -s -st -sp -b -nf -- mplayer -tv driver=v4l2:device=$CAMDEV tv:// -wid WID -quiet
+	else
+		if [ $# -eq 1 ]
+		then
+			xwinwrap -ni -fs -s -st -sp -b -nf -- mplayer -tv driver=v4l2:device="$1" tv:// -wid WID -quiet
+		else
+			echo -e "Wrap Camera-Video via Mplayer to the Desktop"
+			echo -e "${BLUE}usage:${blue} xwwcam() [<Camera-Device>]"
+		fi
+	fi
+}
+
+xwwmovie()
+{
+	if [ $# -gt 0 ]
+	then
+		if [ $# -eq 1 ]
+		then
+			xwinwrap -ni -fs -s -st -sp -b -nf -- mplayer -wid WID -quiet "$1"
+		fi
+		if [ $# -eq 2 ]
+		then
+			xwinwrap -ni -o $2 -fs -s -st -sp -b -nf -- mplayer -wid WID -quiet "$1"
+		fi
+	else
+		echo -e "Wrap a Movie via Mplayer to the Desktop"
+		echo -e "${BLUE}usage:${blue} xwwmovie() <moviefile> [<opacity(0.0-1.0)>]"
+	fi
+}
+
+xwwscrsvr()
+{
+	if [ $# -gt 0 ]
+	then
+		if [ $# -eq 1 ]
+		then
+			xwinwrap -ni -argb -fs -s -st -sp -b -nf -- "$1" -window-id WID -root
+		fi
+		if [ $# -eq 2 ]
+		then
+			xwinwrap -ni -argb -o $2 -fs -s -st -sp -b -nf -- "$1" -window-id WID -root
+		fi
+	else
+		echo -e "Wrap a Screensaver to the Desktop"
+		echo -e "${BLUE}usage:${blue}<screensaver> [<opacity(0.0-1.0)>]"
+	fi
+}
+
+
+
+## xfce
+sessionswitch()
+{
+	if [ $# -gt 0 ]
+	then
+		if [ $1 == "compiz" ]
+		then
+			sudo cp /etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xfce4-session.xml.compiz \
+				/etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xfce4-session.xml
+		fi
+		if [ $1 == "xfwm" ]
+		then
+			sudo cp /etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xfce4-session.xml.xfwm \
+				/etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xfce4-session.xml
+		fi
+	else
+		echo $0 '<compiz/xfwm>'
+	fi
+}
+
+
+
+## SSH/SCP... Functions
+alias vdrmount="mountsshfs root@$VDRADDR:/"
+alias vdrmountstuff="mountsshfs $VDRUSER@$VDRADDR:/home/$VDRUSER/stuff"
+
+serverdo()
+{
+	if [ $1 == "--help" ]; then
+		echo -e "Execute a command or LogIn to Server"
+		echo -e "${BLUE}usage:${blue} serverdo() [<command>]"
+	fi
+	ssh -c arcfour -XC $SERVERUSER@$SERVERADDR ${1+"$@"};
+}
+
+serverput()
+{
+	if [ $# -gt 0 ]; then
+		FOLDER=$1
+		shift
+		scp ${1+"$@"} $SERVERUSER@$SERVERADDR:$FOLDER
+	else
+		echo -e "Copy one or more files to Server"
+		echo -e "${BLUE}usage:${blue} serverput() <folder> <file1> [<file2> ...]"
+	fi
+}
+
+serverget()
+{
+	if [ $# -gt 0 ]; then
+		for FILE in $@; do
+			ssh $SERVERUSER@$SERVERADDR nohup "cat $FILE" > $(echo $FILE|awk -F/ '{print $NF}');
+		done
+	else
+		echo -e "Copy one or more files from Server"
+		echo -e "${BLUE}usage:${blue} serverget() <path1> [<path2> ...]"
+	fi
+}
+
+vdrdo()
+{
+	if [ $1 == "--help" ]; then
+		echo -e "Execute a command or LogIn to VDR"
+		echo -e "${BLUE}usage:${blue} vdrdo() [<command>]"
+	fi
+	ssh -c arcfour -XC root@$VDRADDR ${1+"$@"};
+}
+
+vdrput()
+{
+	if [ $# -gt 0 ]; then
+		FOLDER=$1
+		shift
+		scp ${1+"$@"} root@$VDRADDR:$FOLDER
+	else
+		echo -e "Copy one or more files to VDR"
+		echo -e "${BLUE}usage:${blue} vdrput() <folder> <file1> [<file2> ...]"
+	fi
+}
+
+vdrget()
+{
+	if [ $# -gt 0 ]; then
+		for FILE in $@; do
+			ssh root@$VDRADDR nohup "cat $FILE" > $(echo $FILE|awk -F/ '{print $NF}');
+		done
+	else
+		echo -e "Copy one or more files from VDR"
+		echo -e "${BLUE}usage:${blue} vdrget() <path1> [<path2> ...]"
+	fi
+}
+
+vdrstuff()
+{	
+	if [ $# -gt 1 ]
+	then
+		case $1 in
+		games*)		FOLDER=$1 ;;
+		movies*)	FOLDER=$1 ;;
+		music*)		FOLDER=$1 ;;
+		pictures*)	FOLDER=$1 ;;
+		video*)		FOLDER=$1 ;;
+		*)		echo -e "${RED}Error:${red} '$1' is not correct"
+				return 1 ;;
+		esac
+	else
+                echo -e "Copy one or more files to one of VDRs Stuff-SubFolders"
+                echo -e "${BLUE}usage:${blue} vdrstuff() <dest:[games|movies|music|pictures|video]> <file1> <file2> ... "
+	fi
+	shift
+	scp ${1+"$@"} $VDRUSER@$VDRADDR:/home/$VDRUSER/stuff/$FOLDER/
+}
+
+
+
+## VirtualBox
+alias windows='VirtualBox --startvm Windows7'
+
+
+
+## Clock
+alias sethwclock='sudo ntpdate pool.ntp.org && sudo hwclock --systohc'
+
+
+
+## Android
+android_exports()
+{
+        export ANDROID_SDK="~/android/adt-bundle-linux-x86_64-20130729/sdk"
+        export ANDROID_NDK="~/android/android-ndk-r9b"
+        export ANDROID_SDK_ROOT=$ANDROID_SDK
+        export ANDROID_NDK_ROOT=$ANDROID_NDK
+        export ANDROID_SDK_HOME=$ANDROID_SDK
+        export ANDROID_NDK_HOME=$ANDROID_NDK
+
+        export 
+PATH=$PATH:$ANDROID_SDK/tools:$ANDROID_SDK/platform-tools:$ANDROID_SDK/build-tools/18.1$
+
+        export ANDROID_HOME=$ANDROID_SDK
+        export ANDROID_JAVA_HOME="/usr/lib64/icedtea7"
+}
+

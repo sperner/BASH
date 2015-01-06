@@ -1,0 +1,43 @@
+# Bash-Completion for my Edit-Script
+#
+
+_eedit() 
+{
+    local cur prev opts special i
+    COMPREPLY=()
+    cur=`_get_cword`
+    #cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+    #opts="--keywords --license --mask --unmask --use"
+    opts="keywords license mask unmask use make layman laymancfg sandbox fbcon \
+	  access acpi acpid alsa \
+	  bashrc bluetooth bootmisc \
+	  capability clock consolefont cpufrequtils cpufreqd \
+	  crontab cups cupsd cupspdf \
+	  dispatch distcc distccd \
+	  e2fsck eixrc etcupdate exports \
+	  fancontrol fcron fcrontab fstab fuse \
+	  gitd gpm group grub gshadow \
+	  hald hcid hdparm hostname hosts hsqldb \
+	  inittab iptables ip6tables irexec \
+	  keymaps \
+	  lcd4linux lcdd lcdexec lcdproc lcdvc ld lirc lircd \
+	  limits lmsensors locale localtime login logrotate \
+	  man microcode minicom mke2fs moblock modprobe mysqk mysqld mysqlaccess \
+	  namespace net networks nfs nscd ntop ntp ntpc ntpd nvclock \
+	  openvpn \
+	  pamenv passwd pciparm portmap \
+	  rc rconf resolv rfcomm rsync rsyncd \
+	  securetty services sensors shadow smart smartd samba smb smbusers \
+	  snmpd snmptrapd splash ssh sshd start stop svnd sysctl syslog \
+	  time \
+	  udev udevd updatedb urandom useradd \
+	  wgetrc \
+	  xdm xorg"
+
+#echo 'bin im skript'
+
+    COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+    return 0
+}
+complete -F _eedit eedit

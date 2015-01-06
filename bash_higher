@@ -1,4 +1,4 @@
-## ga-890fx-uda
+## Functions for modern systems
 # Author: Sven Sperner <cethss@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
@@ -32,12 +32,12 @@ cpuset()
 {
 	if [ $# -gt 0 ]
 	then
-		MIN=$(cpufreq-info|grep Grenzen|head -1|cut -d\  -f7)
-		MAX=$(cpufreq-info|grep Grenzen|head -1|cut -d\  -f10)
+		MIN=$(cpupower -c 0,1 frequency-info|grep Grenzen|head -1|cut -d\  -f7)
+		MAX=$(cpupower -c 0,1 frequency-info|grep Grenzen|head -1|cut -d\  -f10)
 		[[ $(echo $MAX|grep '\.') ]]; MAX=$(echo $MAX|sed 's/\.//')0
 		[[ $(cat /sys/class/power_supply/BAT1/present) ]]; GOV=ondemand : GOV=powersave
 		for ((NUM=0 ; NUM<=$CORES ; NUM++ )); do
-			sudo cpufreq-set -g ${1:-$GOV} --min ${2:-$MIN}MHz --max ${3:-$MAX}MHz -c $NUM
+			sudo cpupower frequency-info -g ${1:-$GOV} --min ${2:-$MIN}MHz --max ${3:-$MAX}MHz -c $NUM
 		done
 	else
                 echo -e "Set the CPU-Frequency Governor"
@@ -48,7 +48,7 @@ cpuset()
 cpuinfo()
 {
 	if [ $# -eq 0 ]; then
-	        TEMP=$(cpufreq-info|egrep "CPU |Der Regler|Taktfrequenz ist"|sed 's/analysiere //g' \
+	        TEMP=$(cpupower -c 0,1 frequency-info|egrep "CPU |Der Regler|Taktfrequenz ist"|sed 's/analysiere //g' \
 			| sed 's/liegen. Der Regler "//g' | sed 's/" kann frei entscheiden,/ ->/g' \
 			| sed 's/momentane Taktfrequenz ist//g')
 	        echo $TEMP | sed 's/\. /\n/g' | sed 's/ ist /=/g' | sed 's/MHz./MHz/g'
@@ -563,7 +563,7 @@ vdrstuff()
 
 
 ## VirtualBox
-alias windows='VirtualBox --startvm "Windows XP"'
+alias windows='VirtualBox --startvm Windows7'
 
 
 
@@ -587,3 +587,4 @@ android_exports()
 	export ANDROID_HOME=$ANDROID_SDK
 	export ANDROID_JAVA_HOME="/usr/lib64/icedtea7"
 }
+

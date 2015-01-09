@@ -1,0 +1,20 @@
+#!/sbin/runscript
+
+depend() {
+#	use net
+#	need avahi-daemon dbus
+	before alsasound
+	after localmount
+}
+
+start() {
+        ebegin "Setting Display-Brightness"
+        /sbin/brightness
+        eend $? "Unable to set Display-Brightness"
+}
+
+stop() { 
+        ebegin "Setting Display-Brightness"
+        /sbin/brightness
+        eend $? "Unable to set Display-Brightness"
+}

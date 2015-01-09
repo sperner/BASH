@@ -29,8 +29,11 @@ fi
 # Include Gentoo specific Stuff
 [[ -f ~/.bash_gentoo ]] && . ~/.bash_gentoo
 
-# Include Vento specific Stuff
-[[ -f ~/.bash_vento ]] && . ~/.bash_vento
+# Include Arch specific Stuff
+[[ -f ~/.bash_arch ]] && . ~/.bash_arch
+
+# Include specific Stuff for modern systems
+[[ -f ~/.bash_higher ]] && . ~/.bash_higher
 
 export TIMEFORMAT=$'\nreal %3R\tuser %3U\tsys %3S\tpcpu %P\n'
 export HISTTIMEFORMAT="%H:%M > "
@@ -50,4 +53,4 @@ fi
 # Bash-Completion
 [[ -f /etc/profile.d/bash-completion.sh ]] && source /etc/profile.d/bash-completion.sh
 
-export PATH=$PATH:/usr/local/sbin:/usr/sbin:/sbin
+export PATH=$PATH:/usr/local/sbin:/usr/sbin:/sbin:~/.bin

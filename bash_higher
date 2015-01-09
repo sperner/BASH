@@ -41,7 +41,7 @@ cpuset()
 		done
 	else
                 echo -e "Set the CPU-Frequency Governor"
-                echo -e "${BLUE}usage:${blue} cpuset() [powersave|ondemand|performance] [MIN MAX (MHz)]"
+                echo -e "${BLUE}usage:${blue} cpuset() [powersave|ondemand|performance] [MIN MAX (MHz)]${nocol}"
 	fi
 }
 
@@ -53,8 +53,9 @@ cpuinfo()
 			| sed 's/momentane Taktfrequenz ist//g')
 	        echo $TEMP | sed 's/\. /\n/g' | sed 's/ ist /=/g' | sed 's/MHz./MHz/g'
 	else
-	        cpufreq-info | egrep "analysiere|momentane|Regler" | sed "s/,//g" | sed "s/und/-/g" \
-	        | sed "s/die Frequenz soll innerhalb//g" | sed "s/liegen.//g" #| sed "s/\.//g"
+		cpupower -c 0,1 frequency-info | egrep "analysiere|momentane|Regler" | sed \
+		"s/,//g" | sed "s/und/-/g" | sed "s/die Frequenz soll innerhalb//g" | sed \
+		"s/liegen.//g" #| sed "s/\.//g"
 	fi
 }
 
@@ -62,7 +63,7 @@ cpuusage()
 {
 	if [ $# -eq "--help" ]; then
 		echo -e "Print CPU usages of processes"
-                echo -e "${RED}usage:${BLUE} cpuusage() [<numproc>]" && return;
+                echo -e "${RED}usage:${BLUE} cpuusage() [<numproc>]${nocol}" && return;
 	else
                 pidstat | sort -k 6 -r | head -${1:-7}
        
@@ -165,7 +166,7 @@ blueinfo()
 		rfcomm show $address
 	else
 		echo -e "Information about a Bluetooth-Device"
-		echo -e "${BLUE}usage:${blue} blueinfo() <DeviceName>"
+		echo -e "${BLUE}usage:${blue} blueinfo() <DeviceName>${nocol}"
 		echo -e "${nocol}"
 		hciconfig oobdata
 		hciconfig commands
@@ -183,7 +184,7 @@ bluemount()
 		obexfs -b $address /media/blue
 	else
 		echo -e "Connect to Bluetooth-Device and Mount MassStorage"
-		echo -e "${BLUE}usage:${blue} bluemount() <DeviceName>"
+		echo -e "${BLUE}usage:${blue} bluemount() <DeviceName>${nocol}"
 	fi
 }
 
@@ -195,7 +196,7 @@ blueping()
 		l2ping -i $address -c 3
 	else
 		echo -e "L2CAP Ping"
-		echo -e "${BLUE}usage:${blue} blueping() <DeviceName>"
+		echo -e "${BLUE}usage:${blue} blueping() <DeviceName>${nocol}"
 	fi
 }
 
@@ -239,7 +240,7 @@ demux()
 	        ffmpeg -i $1 -vcodec copy -f rawvideo $1.$VEND -acodec copy $1.$AEND
 	else
 		echo -e "Split Movie into seperate Audio-/Video-Files"
-		echo -e "${BLUE}usage:${blue} demux() <Moviefile>"
+		echo -e "${BLUE}usage:${blue} demux() <Moviefile>${nocol}"
 	fi
 }
 
@@ -248,7 +249,7 @@ remux()
 	if [ $# -lt 3 ]
 	then
 		echo -e "Combine Audio-/Video-Files into a Moviefile"
-		echo -e "${BLUE}usage:${blue} remux() <videofile> <audiofile> <outfile>"
+		echo -e "${BLUE}usage:${blue} remux() <videofile> <audiofile> <outfile>${nocol}"
 	else
 		ffmpeg -i $1 -vcodec copy -i $2 -acodec copy $3
 	fi
@@ -262,7 +263,7 @@ normux()
 		normalize $1
 	else
 		echo -e "Normalize the amplitude of any audiofile"
-		echo -e "${BLUE}usage:${blue} remux() <audiofile>"
+		echo -e "${BLUE}usage:${blue} remux() <audiofile>${nocol}"
 	fi
 }
 
@@ -281,7 +282,7 @@ mplfbcon()
 		fi
 	else
 		echo -e "Play Mediafile in FramBuffer-Console"
-		echo -e "${BLUE}usage:${blue} mplfbcon() <File2Play>"
+		echo -e "${BLUE}usage:${blue} mplfbcon() <File2Play>${nocol}"
 	fi
 }
 
@@ -306,7 +307,7 @@ mpluvc()
 					mplayer -vo caca -fs -tv driver=v4l2:device=/dev/video0 tv://
 				else
 					echo -e "Grab Video from Video4Linux-Device"
-					echo -e "${BLUE}usage:${blue} mpluvc() [fb|fb2|caca]"
+					echo -e "${BLUE}usage:${blue} mpluvc() [fb|fb2|caca]${nocol}"
 				fi
 			fi
 		fi
@@ -324,7 +325,7 @@ mencuvc()
 			mencoder tv:// -tv driver=v4l2:width=640:height=480:device="$2":forceaudio:alsa -ovc lavc -oac mp3lame -o "$1"
 		else
 			echo -e "Grab and Save Video from Video4Linux-Device"
-			echo -e "${BLUE}usage:${blue} mencuvc() <File2Save2> [<Video-Device>]"
+			echo -e "${BLUE}usage:${blue} mencuvc() <File2Save2> [<Video-Device>]${nocol}"
 		fi
 	fi
 }
@@ -336,7 +337,7 @@ watchvdr()
 		mplayer http://$VDRADDR:3000/PES/$1
 	else
                         echo -e "Watch TV via Strem from VDR"
-                        echo -e "${BLUE}usage:${blue} watchvdr() <ChannelNo>"
+                        echo -e "${BLUE}usage:${blue} watchvdr() <ChannelNo>${nocol}"
 	fi
 }
 
@@ -354,7 +355,7 @@ xwwcam()
 			xwinwrap -ni -fs -s -st -sp -b -nf -- mplayer -tv driver=v4l2:device="$1" tv:// -wid WID -quiet
 		else
 			echo -e "Wrap Camera-Video via Mplayer to the Desktop"
-			echo -e "${BLUE}usage:${blue} xwwcam() [<Camera-Device>]"
+			echo -e "${BLUE}usage:${blue} xwwcam() [<Camera-Device>]${nocol}"
 		fi
 	fi
 }
@@ -373,7 +374,7 @@ xwwmovie()
 		fi
 	else
 		echo -e "Wrap a Movie via Mplayer to the Desktop"
-		echo -e "${BLUE}usage:${blue} xwwmovie() <moviefile> [<opacity(0.0-1.0)>]"
+		echo -e "${BLUE}usage:${blue} xwwmovie() <moviefile> [<opacity(0.0-1.0)>]${nocol}"
 	fi
 }
 
@@ -391,7 +392,7 @@ xwwscrsvr()
 		fi
 	else
 		echo -e "Wrap a Screensaver to the Desktop"
-		echo -e "${BLUE}usage:${blue}<screensaver> [<opacity(0.0-1.0)>]"
+		echo -e "${BLUE}usage:${blue}<screensaver> [<opacity(0.0-1.0)>]${nocol}"
 	fi
 }
 
@@ -490,7 +491,7 @@ serverput()
 		scp ${1+"$@"} $SERVERUSER@$SERVERADDR:$FOLDER
 	else
 		echo -e "Copy one or more files to Server"
-		echo -e "${BLUE}usage:${blue} serverput() <folder> <file1> [<file2> ...]"
+		echo -e "${BLUE}usage:${blue} serverput() <folder> <file1> [<file2> ...]${nocol}"
 	fi
 }
 
@@ -502,7 +503,7 @@ serverget()
 		done
 	else
 		echo -e "Copy one or more files from Server"
-		echo -e "${BLUE}usage:${blue} serverget() <path1> [<path2> ...]"
+		echo -e "${BLUE}usage:${blue} serverget() <path1> [<path2> ...]${nocol}"
 	fi
 }
 
@@ -510,7 +511,7 @@ vdrdo()
 {
 	if [ $1 == "--help" ]; then
 		echo -e "Execute a command or LogIn to VDR"
-		echo -e "${BLUE}usage:${blue} vdrdo() [<command>]"
+		echo -e "${BLUE}usage:${blue} vdrdo() [<command>]${nocol}"
 	fi
 	ssh -c arcfour -XC root@$VDRADDR ${1+"$@"};
 }
@@ -523,7 +524,7 @@ vdrput()
 		scp ${1+"$@"} root@$VDRADDR:$FOLDER
 	else
 		echo -e "Copy one or more files to VDR"
-		echo -e "${BLUE}usage:${blue} vdrput() <folder> <file1> [<file2> ...]"
+		echo -e "${BLUE}usage:${blue} vdrput() <folder> <file1> [<file2> ...]${nocol}"
 	fi
 }
 
@@ -535,7 +536,7 @@ vdrget()
 		done
 	else
 		echo -e "Copy one or more files from VDR"
-		echo -e "${BLUE}usage:${blue} vdrget() <path1> [<path2> ...]"
+		echo -e "${BLUE}usage:${blue} vdrget() <path1> [<path2> ...]${nocol}"
 	fi
 }
 
@@ -554,7 +555,7 @@ vdrstuff()
 		esac
 	else
                 echo -e "Copy one or more files to one of VDRs Stuff-SubFolders"
-                echo -e "${BLUE}usage:${blue} vdrstuff() <dest:[games|movies|music|pictures|video]> <file1> <file2> ... "
+                echo -e "${BLUE}usage:${blue} vdrstuff() <dest:[games|movies|music|pictures|video]> <file1> <file2> ... ${nocol}" && return;
 	fi
 	shift
 	scp ${1+"$@"} $VDRUSER@$VDRADDR:/home/$VDRUSER/stuff/$FOLDER/

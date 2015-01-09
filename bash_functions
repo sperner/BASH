@@ -19,7 +19,7 @@ ask()
 {
 	if [ "$#" -lt 1 ]; then
 		echo -e "Ask if something should be done and return 0/1"
-		echo -e "${RED}usage:${BLUE} ask() <question>" && return;
+		echo -e "${RED}usage:${BLUE} ask() <question>${nocol}" && return;
 	fi
 	echo -n "$@" '[y/n] ' ; read ans
 	case "$ans" in
@@ -44,7 +44,7 @@ repeat()
 {
 	if [ "$#" -lt 2 ]; then
 		echo -e "Repeat a given command n-times"
-		echo -e "${RED}usage:${BLUE} repeat() <n> <program>${blue} [<param1> <...>]" && return;
+		echo -e "${RED}usage:${BLUE} repeat() <n> <program>${blue} [<param1> <...>]${nocol}" && return;
 	fi
 	local i max
 	max=$1; shift;
@@ -57,7 +57,7 @@ man2pdf()
 {
 	if [ "$#" -lt 1 ]; then
 		echo -e "Generate PDF dokument from man-page"
-		echo -e "${RED}usage:${BLUE} man2pdf() <site>" && return;
+		echo -e "${RED}usage:${BLUE} man2pdf() <site>${nocol}" && return;
 	fi
 	man -t $1 | ps2pdf - > $1.pdf
 }
@@ -66,7 +66,7 @@ bu()
 {
         if [ "$#" -lt 1 ]; then
                 echo -e "Backup a file (append date to name)"
-                echo -e "${RED}usage:${BLUE} bu() <filepath>" && return;
+                echo -e "${RED}usage:${BLUE} bu() <filepath>${nocol}" && return;
         fi
 	cp $1 ${1}-`date +%Y%m%d%H%M`.backup ;
 }
@@ -93,7 +93,7 @@ start()
 {
 	if [ "$#" -lt 1 ]; then
 		echo -e "Start a Daemon via Initscript"
-		echo -e "${RED}usage:${BLUE} start() <scriptname>" && return;
+		echo -e "${RED}usage:${BLUE} start() <scriptname>${nocol}" && return;
 	fi
 	if [ -f /etc/init.d/$1 ]
 	then
@@ -109,7 +109,7 @@ stop()
 {
 	if [ "$#" -lt 1 ]; then
 		echo -e "Stop a Daemon via Initscript"
-		echo -e "${RED}usage:${BLUE} stop() <scriptname>" && return;
+		echo -e "${RED}usage:${BLUE} stop() <scriptname>${nocol}" && return;
 	fi
 	if [ -f /etc/init.d/$1 ]
 	then
@@ -125,7 +125,7 @@ restart()
 {
 	if [ "$#" -lt 1 ]; then
 		echo -e "Restart a Daemon via Initscript"
-		echo -e "${RED}usage:${BLUE} restart() <scriptname>" && return;
+		echo -e "${RED}usage:${BLUE} restart() <scriptname>${nocol}" && return;
 	fi
 	if [ -f /etc/init.d/$1 ]
 	then
@@ -141,7 +141,7 @@ reload()
 {
 	if [ "$#" -lt 1 ]; then
 		echo -e "Reload Configuration of a Daemon via Initscript"
-		echo -e "${RED}usage:${BLUE} reload() <scriptname>" && return;
+		echo -e "${RED}usage:${BLUE} reload() <scriptname>${nocol}" && return;
 	fi
 	if [ -f /etc/init.d/$1 ]
 	then
@@ -157,7 +157,7 @@ status()
 {
 	if [ "$#" -lt 1 ]; then
 		echo -e "Show status of a Daemon via Initscript"
-		echo -e "${RED}usage:${BLUE} status() <scriptname>" && return;
+		echo -e "${RED}usage:${BLUE} status() <scriptname>${nocol}" && return;
 	fi
 	if [ -f /etc/init.d/$1 ]
 	then
@@ -176,7 +176,7 @@ sigkill()
 {
         if [ "$#" -lt 1 ]; then
                 echo -e "Send KILL - Signal to a process"
-                echo -e "${RED}usage:${BLUE} sigkill() <name/id>" && return;
+                echo -e "${RED}usage:${BLUE} sigkill() <name/id>${nocol}" && return;
         fi
 	if [[ "$1" =~ ^[0-9]+$ ]]
 	then
@@ -190,7 +190,7 @@ sigcont()
 {
         if [ "$#" -lt 1 ]; then
                 echo -e "Send CONTINUE - Signal to a process"
-                echo -e "${RED}usage:${BLUE} sigcont() <name/id>" && return;
+                echo -e "${RED}usage:${BLUE} sigcont() <name/id>${nocol}" && return;
         fi
 	if [[ "$1" =~ ^[0-9]+$ ]]
 	then
@@ -204,7 +204,7 @@ sigstop()
 {
         if [ "$#" -lt 1 ]; then
                 echo -e "Send STOP - Signal to a process"
-                echo -e "${RED}usage:${BLUE} sigstop() <name/id>" && return;
+                echo -e "${RED}usage:${BLUE} sigstop() <name/id>${nocol}" && return;
         fi
 	if [[ "$1" =~ ^[0-9]+$ ]]
 	then
@@ -221,7 +221,7 @@ add2path()
 {
 	if [ $# -lt 1 ] || [ $# -gt 2 ]; then
 		echo -e "Temporarily add a directory to PATH-variable"
-		echo -e "${RED}usage:${BLUE} apath() <directory>"
+		echo -e "${RED}usage:${BLUE} apath() <directory>${nocol}"
 	else
 		PATH=$1:$PATH
 	fi
@@ -237,7 +237,7 @@ chgroot()
 	if [ $# -lt 1 ]
 	then
 		echo -e "Bind virtual filesystems and change root"
-		echo -e "${RED}usage:${BLUE} chgroot() <directory>"
+		echo -e "${RED}usage:${BLUE} chgroot() <directory>${nocol}"
 	else
 		sudo mount -t proc /proc $1/proc	|| echo "$0: ${RED}Mounting /proc failed"; exit -1
 		sudo mount --rbind /dev $1/dev		|| echo "$0: ${RED}Mounting /dev failed"; exit -1
@@ -269,7 +269,7 @@ runs()
 		ps -elf | grep -v grep | grep -i $1
 	else
 		echo -e "Does a given process run?"
-		echo -e "${RED}usage:${BLUE} runs()${blue} [<string>]"
+		echo -e "${RED}usage:${BLUE} runs()${blue} [<string>]${nocol}"
 	fi
 }
 
@@ -290,7 +290,7 @@ killps()
 	local pid pname sig="-TERM"			# Default signal
 	if [ "$#" -lt 1 ] || [ "$#" -gt 2 ]; then
 		echo -e "Kill by process name"
-		echo -e "${RED}usage: ${BLUE}killps${blue} [-SIGNAL]${BLUE} <pattern>"
+		echo -e "${RED}usage: ${BLUE}killps${blue} [-SIGNAL]${BLUE} <pattern>${nocol}"
 		return;
 	fi
 	if [ $# = 2 ]; then sig=$1 ; fi
@@ -309,7 +309,7 @@ killin()
 		kill -9 $(ps -e | grep -i $1 | cut -d" " -f2)
 	else
 		echo -e "Kill by process name in given time"
-		echo -e "${RED}usage: ${BLUE}killin <seconds>"
+		echo -e "${RED}usage: ${BLUE}killin <seconds>${nocol}"
 	fi
 }
 
@@ -335,7 +335,7 @@ parse()
 		grep -iR $2 $1
 	else
 		echo -e "Parse File(s) for String and PrintOut"
-		echo -e "${RED}usage:${BLUE} parse() <File/Path2Parse> <String2Look4>"
+		echo -e "${RED}usage:${BLUE} parse() <File/Path2Parse> <String2Look4>${nocol}"
 	fi
 }
 
@@ -343,7 +343,7 @@ lsofp()
 {
 	if [ "$1" == "--help"  ]; then
 		echo -e "Find file(s) opened by process"
-		echo -e "${RED}usage:${BLUE} lsofp() <processname>" && return;
+		echo -e "${RED}usage:${BLUE} lsofp() <processname>${nocol}" && return;
 	fi
 
 	lsof +p `pidof $1`|sort -k 9
@@ -363,7 +363,7 @@ fls()
 {
 	if [ "$1" == "--help" ]; then
 		echo -e "List files & directories with the full path"
-		echo -e "${RED}usage:${BLUE} fls() [<path>]" && return;
+		echo -e "${RED}usage:${BLUE} fls() [<path>]${nocol}" && return;
 	fi
 	find ${1:-.} -maxdepth 1
 }
@@ -372,7 +372,7 @@ ff()
 {
 	if [ "$#" -lt 1 ]; then
 		echo -e "Find (a) file(s) with a specific pattern in name"
-		echo -e "${RED}usage:${BLUE} ff() <question>" && return;
+		echo -e "${RED}usage:${BLUE} ff() <question>${nocol}" && return;
 	fi
 	find . -type f -iname '*'$*'*' -ls;
 }
@@ -381,7 +381,7 @@ ffe()
 {
 	if [ "$#" -lt 2 ]; then
 		echo -e "Find (a) file(s) with pattern and execute command on it"
-		echo -e "${RED}usage:${BLUE} ffe() <pattern> <command>${blue} [<param1> <...>]" && return;
+		echo -e "${RED}usage:${BLUE} ffe() <pattern> <command>${blue} [<param1> <...>]${nocol}" && return;
 	fi
 	find . -type f -iname '*'${1:-}'*' -exec ${2:-file} {} \;  ;
 }
@@ -392,7 +392,7 @@ fsif()
 	local case=""
 	if [ "$#" -lt 1 ]; then
 		echo -e "Find a pattern in a set of files and highlight them"
-		echo -e "${RED}usage:${BLUE} fsif() [-i] <pattern>${blue} [<filename-pattern>]" && return;
+		echo -e "${RED}usage:${BLUE} fsif() [-i] <pattern>${blue} [<filename-pattern>]${nocol}" && return;
 	fi
 	while getopts :it opt
 	do
@@ -409,7 +409,7 @@ cbt()
 {
 	if [ "$#" -lt 1 ]; then
 		echo -e "Count files by type"
-		echo -e "${RED}usage:${BLUE} cbt() <filename-pattern>" && return;
+		echo -e "${RED}usage:${BLUE} cbt() <filename-pattern>${nocol}" && return;
 	fi
 	find ${*-.} -type f -print0 | xargs -0 file | awk -F, '{print $1}' | awk '{$1=NULL;print $0}' | sort | uniq -c | sort -nr ;
 }
@@ -418,7 +418,7 @@ cbt()
 {
 	if [ "$#" -lt 1 ]; then
 		echo -e "Change filename(s) to lowercase"
-		echo -e "${RED}usage:${BLUE} 2Lowercase() <filename-pattern>" && return;
+		echo -e "${RED}usage:${BLUE} 2Lowercase() <filename-pattern>${nocol}" && return;
 	fi
 	for i in "$@"; do mv -f "$i" "`echo $i| tr [A-Z] [a-z]`" &>/dev/null; done
 }
@@ -427,7 +427,7 @@ cbt()
 {
 	if [ "$#" -lt 1 ]; then
 		echo -e "Change filename(s) to uppercase"
-		echo -e "${RED}usage:${BLUE} 2Uppercase() <filename-pattern>" && return;
+		echo -e "${RED}usage:${BLUE} 2Uppercase() <filename-pattern>${nocol}" && return;
 	fi
 	for i in "$@"; do mv -f "$i" "`echo $i| tr [a-z] [A-Z]`" &>/dev/null; done
 }
@@ -436,7 +436,7 @@ space2underscore()
 {
 	if [ "$#" -lt 1 ]; then
 		echo -e "Change filename(s) spaces to underscores"
-		echo -e "${RED}usage:${BLUE} space2underscore() <filename-pattern>" && return;
+		echo -e "${RED}usage:${BLUE} space2underscore() <filename-pattern>${nocol}" && return;
 	fi
 	for i in "$@"; do mv "$i" "`echo $i| tr ' ' '_'`" &>/dev/null; done
 }
@@ -445,7 +445,7 @@ lowercase()  # move filenames to lowercase
 {
 	if [ "$#" -lt 1 ]; then
 		echo -e "Change filename(s) to lowercase"
-		echo -e "${RED}usage:${BLUE} lowercase() <filename-pattern>" && return;
+		echo -e "${RED}usage:${BLUE} lowercase() <filename-pattern>${nocol}" && return;
 	fi
 	for file ; do
 		filename=${file##*/}
@@ -481,7 +481,7 @@ mktar()
 {
 	if [ "$#" -lt 1 ]; then
 		echo -e "Create a Tar-Archive"
-		echo -e "${RED}usage:${BLUE} mktar() <path>" && return;
+		echo -e "${RED}usage:${BLUE} mktar() <path>${nocol}" && return;
 	fi
 	tar cvf  "${1%%/}.tar"     "${1%%/}/";
 }
@@ -490,7 +490,7 @@ mktgz()
 {
 	if [ "$#" -lt 1 ]; then
 		echo -e "Create a Tar/GZIP-Archive"
-		echo -e "${RED}usage:${BLUE} mktgz() <path>" && return;
+		echo -e "${RED}usage:${BLUE} mktgz() <path>${nocol}" && return;
 	fi
 	tar cvzf "${1%%/}.tar.gz"  "${1%%/}/";
 }
@@ -499,7 +499,7 @@ mktbz()
 {
 	if [ "$#" -lt 1 ]; then
 		echo -e "Create a Tar/BZIP2-Archive"
-		echo -e "${RED}usage:${BLUE} mktbz() <path>" && return;
+		echo -e "${RED}usage:${BLUE} mktbz() <path>${nocol}" && return;
 	fi
 	tar cvjf "${1%%/}.tar.bz2" "${1%%/}/";
 }
@@ -508,7 +508,7 @@ mktxz()
 {
 	if [ "$#" -lt 1 ]; then
 		echo -e "Create a Tar/XZ-Archive"
-		echo -e "${RED}usage:${BLUE} mktxz() <path>" && return;
+		echo -e "${RED}usage:${BLUE} mktxz() <path>${nocol}" && return;
 	fi
 	tar cvJf "${1%%/}.tar.xz" "${1%%/}/";
 }
@@ -536,7 +536,7 @@ extract ()
 	*)           echo -e "${red} extract() does not know the extension of ${blue}$1" ;;
     esac
   else
-    echo -e "\n${red}'$1' ${RED}usage:${BLUE} extract() <archive>"
+    echo -e "\n${red}'$1' ${RED}usage:${BLUE} extract() <archive>${nocol}"
   fi
 }
 
@@ -547,63 +547,63 @@ mountusb()
 {
 	if [ "$#" -gt 0 ]; then
 		echo -e "Mount a Filesystem to /media/usb"
-		echo -e "${RED}usage:${BLUE} mountusb() [<device>]";
+		echo -e "${RED}usage:${BLUE} mountusb() [<device>]${nocol}" && return;
 	fi
-	mount ${1:-/dev/sdb1} /media/usb && echo -e "${BLUE}$0: ${blue}${1:-/dev/sdb1} mounted"
+	mount ${1:-/dev/sdb1} /media/usb && echo -e "${BLUE}$0: ${blue}${1:-/dev/sdb1} mounted${nocol}"
 }
 
 mountiso()
 {
 	if [ "$#" -lt 1 ]; then
 		echo -e "Mount an ISO-Imagefile to /media/iso"
-		echo -e "${RED}usage:${BLUE} mountiso() <iso-file>" && return;
+		echo -e "${RED}usage:${BLUE} mountiso() <iso-file>${nocol}" && return;
 	fi
-	mount -o loop -t iso9660 $1 /media/iso && echo -e "${BLUE}$0: ${blue}$1 mounted"
+	mount -o loop -t iso9660 $1 /media/iso && echo -e "${BLUE}$0: ${blue}$1 mounted${nocol}"
 }
 
 mountimg()
 {
 	if [ "$#" -lt 1 ]; then
 		echo -e "Mount an Imagefile (HD,...) to /media/img"
-		echo -e "${RED}usage:${BLUE} mountimg() <img-file>" && return;
+		echo -e "${RED}usage:${BLUE} mountimg() <img-file>${nocol}" && return;
 	fi
-	mount -o loop $1 /media/img && echo -e "${BLUE}$0: ${blue}$1 mounted"
+	mount -o loop $1 /media/img && echo -e "${BLUE}$0: ${blue}$1 mounted${nocol}"
 }
 
 mountnfs()
 {
 	if [ "$#" -lt 1 ]; then
 		echo -e "Mount an NFS-Share to /media/nfs"
-		echo -e "${RED}usage:${BLUE} mountnfs() <[host]:[path]>" && return;
+		echo -e "${RED}usage:${BLUE} mountnfs() <[host]:[path]>${nocol}" && return;
 	fi
-	mount -t nfs $1 /media/nfs && echo -e "${BLUE}$0: ${blue}$1 mounted"
+	mount -t nfs $1 /media/nfs && echo -e "${BLUE}$0: ${blue}$1 mounted${nocol}"
 }
 
 mountsshfs()
 {
 	if [ "$#" -lt 1 ]; then
 		echo -e "Mount an SSH/FS-Path to /media/nfs"
-		echo -e "${RED}usage:${BLUE} mountsshfs() <[user]@[host]:[path]>" && return;
+		echo -e "${RED}usage:${BLUE} mountsshfs() <[user]@[host]:[path]>${nocol}" && return;
 	fi
-	sshfs $1 /media/sshfs && echo -e "${BLUE}$0: ${blue}$1 mounted at /media/sshfs"
+	sshfs $1 /media/sshfs && echo -e "${BLUE}$0: ${blue}$1 mounted at /media/sshfs${nocol}"
 }
 
 mountntfs()
 {
 	if [ "$#" -gt 0 ]; then
 		echo -e "Mount an NTFS-Filesystem to /media/ntfs"
-		echo -e "${RED}usage:${BLUE} mountntfs() [<device>]";
+		echo -e "${RED}usage:${BLUE} mountntfs() [<device>]${nocol}" && return;
 	fi
-	ntfs-3g ${1:-/dev/sdb1} /media/ntfs && echo -e "${BLUE}$0: ${blue}$1 mounted"
+	ntfs-3g ${1:-/dev/sdb1} /media/ntfs && echo -e "${BLUE}$0: ${blue}$1 mounted${nocol}"
 }
 
 mountboot()
 {
         if [ "$#" -gt 0 ]; then
-                echo "Mount the Boot-Partition to /boot"
-                echo "${RED}usage:${BLUE} mountboot() [<device>]";
+                echo -e "Mount the Boot-Partition to /boot"
+                echo -e "${RED}usage:${BLUE} mountboot() [<device>]${nocol}" && return;
         fi
-	sudo mount ${1:-/dev/sda1} /boot && echo -e "${BLUE}$0: ${blue}${1:-/dev/sda1} mounted"
+	sudo mount ${1:-/dev/sda1} /boot && echo -e "${BLUE}$0: ${blue}${1:-/dev/sda1} mounted${nocol}"
 }
 
 
@@ -634,16 +634,16 @@ hostinfo()
 	echo -e "\n${RED}Local IP Address :$NC ${BLUE}" ; echo ${MY_IP:-"Not connected"}
 	echo -e "\n${RED}ISP Address :$NC ${BLUE}" ; echo ${MY_ISP:-"Not connected"}
 	echo -e "\n${RED}Open connections :$NC ${BLUE}"; netstat -pan --inet;
-	echo
+	echo -e "${nocol}"
 }
 
 chmac()
 {
 	if [ "$#" -lt 2 ]; then
 		echo -e "Change ethernet MAC of a network interface"
-		echo -e "${RED}usage:${BLUE} chmac() <interface> <newMAC(xx:xx:xx...)>" && return;
+		echo -e "${RED}usage:${BLUE} chmac() <interface> <newMAC(xx:xx:xx...)>${nocol}" && return;
 	fi
-	sudo ifconfig $1 hw ether $2 && echo -e "Interface:${green}$1 ${nocol}set to ${red}$2"
+	sudo ifconfig $1 hw ether $2 && echo -e "Interface:${green}$1 ${nocol}set to ${red}$2${nocol}"
 }
 
 localip()
@@ -653,6 +653,7 @@ localip()
 #	MY_ISP=$(/sbin/ifconfig ppp0 | awk '/P-t-P/ { print $3 } ' | sed -e s/P-t-P://)
 	MY_IP=$(/sbin/ifconfig eth0 | awk '/inet/ { print $2 } ' | sed -e s/addr://)
 #	MY_ISP=$(pubip)
+	echo $MY_IP
 }
 
 pubip()
@@ -671,7 +672,7 @@ respond()
 {
 	if [ "$#" -lt 1 ]; then
 		echo -e "Respondtime to a Server"
-		echo -e "${RED}usage:${BLUE} respond() <url>" && return;
+		echo -e "${RED}usage:${BLUE} respond() <url>${nocol}" && return;
 	fi
 	curl -o /dev/null -w "Connect: %{time_connect} TTFB: %{time_starttransfer} Total time: %{time_total} \n" $1;
 }
@@ -680,7 +681,7 @@ wdl()
 {
 	if [ "$#" -lt 1 ]; then
 		echo -e "Wget-Download"
-		echo -e "${RED}usage:${BLUE} wdl() <url>" && return;
+		echo -e "${RED}usage:${BLUE} wdl() <url>${nocol}" && return;
 	fi
 	wget -r -l5 -k -E ${1} && cd $_;
 }
@@ -689,7 +690,7 @@ defger()
 {
 	if [ "$#" -lt 1 ]; then
 		echo -e "Print the definition of a german Word"
-		echo -e "${RED}usage:${BLUE} defger() <word>" && return;
+		echo -e "${RED}usage:${BLUE} defger() <word>${nocol}" && return;
 	fi
 	local y="$@";curl -sA"Opera" "http://www.google.de/search?q=define:${y// /+}"|grep -Po '(?<=<li>)[^<]+'|nl|perl -MHTML::Entities -pe 'decode_entities($_)' 2>/dev/null;
 }
@@ -698,7 +699,7 @@ defeng()
 {
 	if [ "$#" -lt 1 ]; then
 		echo -e "Print the definition of an english Word"
-		echo -e "${RED}usage:${BLUE} defeng() <word>" && return;
+		echo -e "${RED}usage:${BLUE} defeng() <word>${nocol}" && return;
 	fi
 	local y="$@";curl -sA"Opera" "http://www.google.com/search?q=define:${y// /+}"|grep -Po '(?<=<li>)[^<]+'|nl|perl -MHTML::Entities -pe 'decode_entities($_)' 2>/dev/null;
 }
@@ -710,7 +711,7 @@ macinfo()
 		links -dump http://standards.ieee.org/cgi-bin/ouisearch?$MAC
 	else
 		echo -e "Get information about the hardware manufacturer via MAC"
-		echo -e "${RED}usage:${BLUE} macinfo() <MAC (\"xx-xx-xx\" or \"xx:xx:xx\")>"
+		echo -e "${RED}usage:${BLUE} macinfo() <MAC (\"xx-xx-xx\" or \"xx:xx:xx\")>${nocol}"
 		echo -e "first three bytes are enough, less bytes result in a list"
 	fi
 }
@@ -736,7 +737,7 @@ translate()
 		fi
 	else
                 echo -e "Get the german translation of an english word"
-                echo -e "${RED}usage:${BLUE} translate() <word>"
+                echo -e "${RED}usage:${BLUE} translate() <word>${nocol}"
 	fi
 }
 
@@ -752,7 +753,7 @@ wiki()
 {
 	if [ "$#" -lt 1 ]; then
 		echo -e "Search Wikipedia for a specific Word"
-		echo -e "${RED}usage:${BLUE} wiki() <word>" && return;
+		echo -e "${RED}usage:${BLUE} wiki() <word>${nocol}" && return;
 	fi
 	dig +short txt "${@}".wp.dg.cx | sed -e 's/" "//g' -e 's/^"//g' -e 's/"$//g' -e 's/ http:/\n\nhttp:/' | fmt -w $(tput cols);
 }
@@ -769,7 +770,7 @@ webserverinfo()
 		fi
 	else
 		echo -e "Print informations about the running WebServer"
-		echo -e "${RED}usage:${BLUE} webserverinfo() <url>" && return;
+		echo -e "${RED}usage:${BLUE} webserverinfo() <url>${nocol}" && return;
 	fi
 }
 
@@ -779,7 +780,7 @@ corename()
 { 
 	if [ "$#" -lt 1 ]; then
 		echo -e "Show Name of the Application that created the CoreDump-file"
-		echo -e "Usage: corename() <file1> [<file2> <...>]" && return;
+		echo -e "Usage: corename() <file1> [<file2> <...>]${nocol}" && return;
 	fi
 	for file ; do
 		echo -n $file : ; gdb --core=$file --batch | head -1

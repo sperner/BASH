@@ -3,6 +3,7 @@
 # Wonder Shaper
 
 # Modifications by Vince Mulhollon for debian package
+# Original version: http://lartc.org/wondershaper/
 
 if [ $# -eq 0 ]; then
   echo Please read the man page for the wondershaper and 

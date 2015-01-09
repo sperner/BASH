@@ -18,7 +18,7 @@
 alias sudo="sudo "
 
 #'ls'-magic
-alias ls='ls -h --color=auto'	#->colorfull
+alias ls='ls -h --color=auto --group-directories-first'	#->colorfull
 alias ll='ls -l'		#->list
 alias la='ls -a'		#->all
 alias lla='ls -la'		#->list all

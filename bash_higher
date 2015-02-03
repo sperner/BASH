@@ -564,7 +564,8 @@ vdrstuff()
 
 
 ## VirtualBox
-alias windows='VirtualBox --startvm Windows7'
+#alias windows='VirtualBox --startvm Windows7'
+alias windows='qemu-system-x86_64 -m 4096 -boot d -monitor stdio  --enable-kvm ~/.vm/windows.qcow2'
 
 
 

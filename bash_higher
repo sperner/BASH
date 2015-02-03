@@ -589,3 +589,7 @@ android_exports()
 	export ANDROID_JAVA_HOME="/usr/lib64/icedtea7"
 }
 
+
+
+## Wine
+alias wine32='export WINEARCH=win32 && export WINEPREFIX=~/.wine32'

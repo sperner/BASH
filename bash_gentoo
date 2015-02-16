@@ -16,7 +16,7 @@
 
 #Variables
 ekey='ACCEPT_KEYWORDS="~x86"'
-CORES=${CORES:-3}
+CORES=$(expr $(cat /proc/cpuinfo|grep processor|tail -1|cut -d\  -f2) + 1)
 export EIX_LIMIT=0
 
 #Aliases

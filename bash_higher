@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ## spec's
-CORES=$(cat /proc/cpuinfo|grep processor|tail -1|cut -d\  -f2)
+CORES=$(expr $(cat /proc/cpuinfo|grep processor|tail -1|cut -d\  -f2) + 1)
 TFTRES=1366x768
 CAMRES=640x480
 CAMDEV=/dev/video0
@@ -32,8 +32,8 @@ cpuset()
 {
 	if [ $# -gt 0 ]
 	then
-		MIN=$(cpupower -c 0,1 frequency-info|grep Grenzen|head -1|cut -d\  -f7)
-		MAX=$(cpupower -c 0,1 frequency-info|grep Grenzen|head -1|cut -d\  -f10)
+		MIN=$(cpupower -c $(seq -s, 0 $(expr $CORES - 1)) frequency-info|grep Grenzen|head -1|cut -d\  -f7)
+		MAX=$(cpupower -c $(seq -s, 0 $(expr $CORES - 1)) frequency-info|grep Grenzen|head -1|cut -d\  -f10)
 		[[ $(echo $MAX|grep '\.') ]]; MAX=$(echo $MAX|sed 's/\.//')0
 		[[ $(cat /sys/class/power_supply/BAT1/present) ]]; GOV=ondemand : GOV=powersave
 		for ((NUM=0 ; NUM<=$CORES ; NUM++ )); do
@@ -48,14 +48,15 @@ cpuset()
 cpuinfo()
 {
 	if [ $# -eq 0 ]; then
-	        TEMP=$(cpupower -c 0,1 frequency-info|egrep "CPU |Der Regler|Taktfrequenz ist"|sed 's/analysiere //g' \
+	        TEMP=$(cpupower -c $(seq -s, 0 $(expr $CORES - 1)) frequency-info|egrep "CPU |Der Regler|Taktfrequenz ist" \
+			|sed 's/analysiere //g' \
 			| sed 's/liegen. Der Regler "//g' | sed 's/" kann frei entscheiden,/ ->/g' \
 			| sed 's/momentane Taktfrequenz ist//g')
 	        echo $TEMP | sed 's/\. /\n/g' | sed 's/ ist /=/g' | sed 's/MHz./MHz/g'
 	else
-		cpupower -c 0,1 frequency-info | egrep "analysiere|momentane|Regler" | sed \
-		"s/,//g" | sed "s/und/-/g" | sed "s/die Frequenz soll innerhalb//g" | sed \
-		"s/liegen.//g" #| sed "s/\.//g"
+		cpupower -c $(seq -s, 0 $(expr $CORES - 1)) frequency-info | egrep "analysiere|momentane|Regler" \
+		| sed "s/,//g" | sed "s/und/-/g" | sed "s/die Frequenz soll innerhalb//g" \
+		| sed "s/liegen.//g" #| sed "s/\.//g"
 	fi
 }
 

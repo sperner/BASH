@@ -17,6 +17,7 @@
 #Variables
 ekey='ACCEPT_KEYWORDS="~x86"'
 CORES=${CORES:-3}
+export EIX_LIMIT=0
 
 #Aliases
 alias eall="sudo emerge -av --update --deep --newuse --with-bdeps=y @system @world"

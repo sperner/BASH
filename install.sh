@@ -4,7 +4,17 @@
 #
 
 
-echo "Copying bash file"
+if [ $1 == "all" ]
+then
+	if [ -d /etc/bash ]
+	then
+		echo "Copying global bashrc"
+		sudo cp etc.bashrc /etc/bash/bashrc
+	fi
+fi
+
+
+echo "Copying bash files"
 for file in $(ls bash*)
 do
 	cp -v $file ~/.$file
@@ -21,3 +31,4 @@ if [ -d ~/.bin ]
 then
 	cp -v {brightness,colors,dokernel,eedit,mute,revlookup,volume,wondershaper} ~/.bin/
 fi
+

@@ -273,13 +273,13 @@ runs()
 	fi
 }
 
-pp()
+psp()
 {
 	[ $# -gt 0 ] && echo "Show personalised _ps_"
 	ps $@ -u $USER -o pid,%cpu,%mem,tty,bsdtime,command ;
 }
 
-ppe()
+pspe()
 {
 	[ $# -gt 0 ] && echo "Show personalised, extended _ps_"
 	pp f | awk '!/awk/ && $0~var' var=${1:-".*"} ;
@@ -359,7 +359,7 @@ lsofu()
 	strace -e trace=file -p `pidof $1`
 }
 
-fls()
+findls()
 {
 	if [ "$1" == "--help" ]; then
 		echo -e "List files & directories with the full path"
@@ -368,7 +368,7 @@ fls()
 	find ${1:-.} -maxdepth 1
 }
 
-ff()
+findfile()
 {
 	if [ "$#" -lt 1 ]; then
 		echo -e "Find (a) file(s) with a specific pattern in name"
@@ -377,7 +377,7 @@ ff()
 	find . -type f -iname '*'$*'*' -ls;
 }
 
-ffe()
+findfileex()
 {
 	if [ "$#" -lt 2 ]; then
 		echo -e "Find (a) file(s) with pattern and execute command on it"
@@ -386,7 +386,7 @@ ffe()
 	find . -type f -iname '*'${1:-}'*' -exec ${2:-file} {} \;  ;
 }
 
-fsif()
+findgrep()
 {
 	OPTIND=1
 	local case=""
@@ -405,7 +405,7 @@ fsif()
 	find . -type f -name "${2:-*}" -print0 | xargs -0 egrep --color=always -sn ${case} "$1" 2>&- | more 
 }
 
-cbt()
+countfiles()
 {
 	if [ "$#" -lt 1 ]; then
 		echo -e "Count files by type"
@@ -414,7 +414,7 @@ cbt()
 	find ${*-.} -type f -print0 | xargs -0 file | awk -F, '{print $1}' | awk '{$1=NULL;print $0}' | sort | uniq -c | sort -nr ;
 }
 
-2Lowercase()
+2lowercase()
 {
 	if [ "$#" -lt 1 ]; then
 		echo -e "Change filename(s) to lowercase"
@@ -423,7 +423,7 @@ cbt()
 	for i in "$@"; do mv -f "$i" "`echo $i| tr [A-Z] [a-z]`" &>/dev/null; done
 }
 
-2Uppercase()
+2uppercase()
 {
 	if [ "$#" -lt 1 ]; then
 		echo -e "Change filename(s) to uppercase"
@@ -787,124 +787,5 @@ corename()
 	done 
 }
 
-
-
-### Begin functions other people wrote
-
-# sudo wrapper
-function exesudo ()
-{
-    local _funcname_="$1"
-    local params=( "$@" )               ## array containing all params passed here
-    local tmpfile="/dev/shm/$RANDOM"    ## temporary file
-    local filecontent                   ## content of the temporary file
-    local regex                         ## regular expression
-    local func                          ## function source
-
-    unset params[0]              ## remove first element
-
-    content="#!/bin/bash\n\n"
-    content="${content}params=(\n"
-
-    regex="\s+"
-    for param in "${params[@]}"
-    do
-        if [[ "$param" =~ $regex ]]
-            then
-                content="${content}\t\"${param}\"\n"
-            else
-                content="${content}\t${param}\n"
-        fi
-    done
-
-    content="$content)\n"
-    echo -e "$content" > "$tmpfile"
-    echo "#$( type "$_funcname_" )" >> "$tmpfile"
-    echo -e "\n$_funcname_ \"\${params[@]}\"\n" >> "$tmpfile"
-
-    sudo bash "$tmpfile"
-    rm -f "$tmpfile"
-}
-
-
-
-# Begin gpg functions
-encrypt ()
-{
-# Use ascii armor
-gpg -ac --no-options "$1"
-}
-
-bencrypt ()
-{
-# No ascii armor
-# Encrypt binary data. jpegs/gifs/vobs/etc.
-gpg -c --no-options "$1"
-}
-
-decrypt ()
-{
-gpg --no-options "$1"
-}
-
-pe ()
-{
-# Passphrase encryption program
-# Created by Dave Crouse 01-13-2006
-# Reads input from text editor and encrypts to screen.
-clear
-echo "         Passphrase Encryption Program";
-echo "--------------------------------------------------"; echo "";
-which $EDITOR &>/dev/null
- if [ $? != "0" ];
-     then
-     echo "It appears that you do not have a text editor set in your .bashrc file.";
-     echo "What editor would you like to use ? " ;
-     read EDITOR ; echo "";
- fi
-echo "Enter the name/comment for this message :"
-read comment
-$EDITOR passphraseencryption
-gpg --armor --comment "$comment" --no-options --output
-passphraseencryption.gpg --symmetric passphraseencryption
-shred -u passphraseencryption ; clear
-echo "Outputting passphrase encrypted message"; echo "" ; echo "" ;
-cat passphraseencryption.gpg ; echo "" ; echo "" ;
-shred -u passphraseencryption.gpg ;
-read -p "Hit enter to exit" temp; clear
-}
-
-keys ()
-{
-# Opens up kgpg keymanager
-kgpg -k
-}
-
-encryptfile ()
-{
-zenity --title="zcrypt: Select a file to encrypt" --file-selection > zcrypt
-encryptthisfile=`cat zcrypt`;rm zcrypt
-# Use ascii armor
-#  --no-options (for NO gui usage)
-gpg -acq --yes ${encryptthisfile}
-zenity --info --title "File Encrypted" --text "$encryptthisfile has been encrypted"
-}
-
-decryptfile ()
-{
-zenity --title="zcrypt: Select a file to decrypt" --file-selection > zcrypt
-decryptthisfile=`cat zcrypt`;rm zcrypt
-# NOTE: This will OVERWRITE existing files with the same name !!!
-gpg --yes -q ${decryptthisfile}
-zenity --info --title "File Decrypted" --text "$encryptthisfile has been decrypted"
-}
-
-# Add a Key from Keyserver to APT-DB
-addkey()
-{
-#gpg --keyserver subkeys.pgp.net --recv $1
-gpg --keyserver wwwkeys.eu.pgp.net --recv $1
-gpg --export --armor $1 | sudo apt-key add -
-}
 
 

@@ -16,16 +16,16 @@
 
 ## spec's
 CORES=$(expr $(cat /proc/cpuinfo|grep processor|tail -1|cut -d\  -f2) + 1)
-TFTRES=1366x768
-CAMRES=640x480
+TFTRES=1920x1080
+CAMRES=1920x1080
 CAMDEV=/dev/video0
 
-HOMENET=
-HOMEMASK=
-VDRADDR=
-VDRUSER=
-SERVERADDR=
-SERVERUSER=
+HOMENET=192.168.0.0
+HOMEMASK=255.255.255.0
+VDRADDR=192.168.0.
+VDRUSER=vdr
+SERVERADDR=192.168.0.
+SERVERUSER=admin
 
 ## CPU
 cpuset()
@@ -107,10 +107,10 @@ wpaswitch()
 			sudo cp /etc/conf.d/net.home /etc/conf.d/net
 			sudo cp /etc/wpa_supplicant/wpa_supplicant.conf.home /etc/wpa_supplicant/wpa_supplicant.conf
 		fi
-		if [ $1 == "fh" ]
+		if [ $1 == "uni" ]
 		then
-			sudo cp /etc/conf.d/net.school /etc/conf.d/net
-			sudo cp /etc/wpa_supplicant/wpa_supplicant.conf.school /etc/wpa_supplicant/wpa_supplicant.conf
+			sudo cp /etc/conf.d/net.uni /etc/conf.d/net
+			sudo cp /etc/wpa_supplicant/wpa_supplicant.conf.uni /etc/wpa_supplicant/wpa_supplicant.conf
 			echo "now enter your password into the config-file..."
 			sleep 1
 			sudo nano /etc/wpa_supplicant/wpa_supplicant.conf
@@ -121,7 +121,7 @@ wpaswitch()
                         sudo cp /etc/wpa_supplicant/wpa_supplicant.conf.open /etc/wpa_supplicant/wpa_supplicant.conf
 		fi
 	else
-		echo $0 '<home/fh>'
+		echo $0 '<home/uni/open>'
 	fi
 }
 
@@ -566,6 +566,10 @@ vdrstuff()
 
 ## VirtualBox
 #alias windows='VirtualBox --startvm Windows7'
+
+
+
+## KVM / QEMU
 alias windows='qemu-system-x86_64 -m 4096 -boot d -monitor stdio  --enable-kvm ~/.vm/windows.qcow2'
 
 

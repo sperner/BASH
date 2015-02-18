@@ -9,6 +9,7 @@
 #  3. near the end of '.bashrc', run 'preexec_install'
 # [3. after 'preexec_install', run 'preexec_xterm_title_install']
 #
+# Author:	???
 
 
 preexec_interactive_mode=""

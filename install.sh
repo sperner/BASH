@@ -4,7 +4,7 @@
 #
 
 
-if [ $1 == "all" ]
+if [[ $1 == "all" ]]
 then
 	if [ -d /etc/bash ]
 	then

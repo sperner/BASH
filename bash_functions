@@ -232,17 +232,22 @@ printtitle()
 	PROMPT_COMMAND="echo -ne '\033]0;$@\007'"
 }
 
-chgroot()
+chrootin()
 {
 	if [ $# -lt 1 ]
 	then
 		echo -e "Bind virtual filesystems and change root"
-		echo -e "${RED}usage:${BLUE} chgroot() <directory>${nocol}"
+		echo -e "${RED}usage:${BLUE} chrootin() <directory>${nocol}"
 	else
-		sudo mount -t proc /proc $1/proc	|| echo "$0: ${RED}Mounting /proc failed"; exit -1
-		sudo mount --rbind /dev $1/dev		|| echo "$0: ${RED}Mounting /dev failed"; exit -1
-		sudo mount --rbind /sys $1/sys		|| echo "$0: ${RED}Mounting /sys failed"; exit -1
-		sudo chroot $1 /bin/bash		|| echo "$0: ${RED}Changing root failed"; exit -1
+		sudo mount -t proc /proc $1/proc	|| { echo "$0: ${RED}Mounting /proc failed"; return -1; }
+		sudo mount --rbind /dev $1/dev		|| { echo "$0: ${RED}Mounting /dev failed"; return -1; }
+		sudo mount --rbind /sys $1/sys		|| { echo "$0: ${RED}Mounting /sys failed"; return -1; }
+		sudo chroot $1 /bin/bash		|| { echo "$0: ${RED}Changing root failed"; return -1; }
+		sudo umount $1/sys/fs/{fuse,cgroup}/*
+		sudo umount $1/sys/fs/cgroup
+		sudo umount $1/sys/kernel/debug
+		sudo umount $1/dev/{shm,mqueue,pts}
+		sudo umount $1/{dev,proc,sys}		|| { echo "$0: ${RED}Unmounting failed"; return -1; }
 	fi
 }
 
@@ -518,6 +523,7 @@ extract ()
     if [ -f $1 ] ; then
 	case $1 in
 	*.tar.bz2)   tar xjvf $1	;;
+	*.tar.bz)    tar xjvf $1	;;
 	*.tar.gz)    tar xzvf $1	;;
 	*.tar.xz)    tar xJvf $1	;;
 	*.bz2)       bunzip2 -v $1	;;
@@ -525,6 +531,7 @@ extract ()
 	*.gz)        gunzip -v $1	;;
 	*.tar)       tar xvf $1		;;
 	*.tbz2)      tar xjvf $1	;;
+	*.tbz)       tar xjvf $1	;;
 	*.tgz)       tar xzvf $1	;;
 	*.zip)       unzip $1		;;
 	*.Z)         uncompress -v $1	;;

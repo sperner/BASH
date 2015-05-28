@@ -481,6 +481,15 @@ swap()  # Swap 2 filenames around, if they exist
     mv $TMPFILE "$2"
 }
 
+filetop()
+{
+	if [ "$#" -lt 1 ]; then
+		echo -e "Change filename(s) to uppercase"
+		echo -e "${RED}usage:${BLUE} filetop() <path>${nocol}" && return;
+	fi
+	watch -dn1 "df -h; ls -FlAth $1"
+}
+
 
 
 ## Archive... Functions

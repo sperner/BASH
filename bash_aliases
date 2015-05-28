@@ -50,6 +50,7 @@ alias 755='chmod 755'
 
 #'mount'-magic
 alias remount='mount -o remount'
+alias mounttab='echo "DEVICE PATH TYPE FLAGS" && mount | awk \$2=\$4=\"\"\;2 | column -t'
 
 #'dd'-magic
 alias readcd='dd if=/dev/cdrom of=cdrom.iso'
@@ -104,9 +105,12 @@ alias lsofn='lsof | awk "!/^\$/ && /\// { print \$9 }" | sort -u'
 alias lsofip='lsof -i'
 alias lsusbn='lsusb 2>&1 | grep -v "libusb: debug"'
 
-#links
+#'links'
 alias linksfb='links -driver fb'
 alias linksdump='links -dump'
+
+#'wget'
+alias wgettrack="wget --random-wait -r -l 0 -p -e robots=off -U Mozilla"
 
 #'netstat'
 alias netstat80="netstat -plan|grep :80|awk {'print $5'}|cut -d: -f 1|sort|uniq -c|sort -nk 1"
@@ -136,6 +140,8 @@ alias wsensor='watch sensors'
 alias woman='man'
 alias shot='import -frame -strip -quality 75 "$HOME/$(date +%s).png'
 alias genmac='for ((i=0;i<6;i++)); do printf "%2.0x" $[$RANDOM%239+16]; [ $i -lt 5  ] && echo -n :; done; echo'
+alias getkeyboards="grep -E 'Handlers|EV=' /proc/bus/input/devices | grep -B1 'EV=120013' | grep -Eo 'event[0-9]+'"
+alias discusage="du -sh /* 2>/dev/null|sort -h"
 
 #/proc
 alias loadavg='cat /proc/loadavg'

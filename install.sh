@@ -17,8 +17,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-
 DISTROS="arch debian gentoo"
+SCRIPTS="brightness colors dokernel eedit healthchk mute power revlookup volume wondershaper"
 
 if [[ $1 == "all" ]]
 then
@@ -42,7 +42,10 @@ then
 fi
 if [ -d ~/.bin ]
 then
-	cp -v {brightness,colors,dokernel,eedit,mute,revlookup,volume,wondershaper} ~/.bin/
+	for script in ${SCRIPTS}
+	do
+		cp -v $script ~/.bin/
+	done
 fi
 
 echo -e "\033[1;37m Copying bash completion(s) \033[0m"

@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-CORES=6
+CORES=$(expr $(cat /proc/cpuinfo|grep processor|tail -1|cut -d\  -f2) + 1)
 
 BLUE="\e[1;34m"
 blue="\e[0;34m"
@@ -31,8 +31,18 @@ do
 	echo -e
 done
 
-echo -e "${blue}Mounting the boot partition${nocol}"
-sudo mount ${1:-/dev/sda1} /boot || exit 1 && echo -e "${BLUE}OK"
+while [ -z $mountopt ]
+do
+	echo -e "${RED}Do you want to mount the boot partition? (y/n)"
+	read mountopt
+	echo -e
+done
+
+if [ $mountopt == 'y' ]
+then
+	echo -e "${blue}Mounting the boot partition${nocol}"
+	sudo mount ${1:-/dev/sda1} /boot || exit 1 && echo -e "${BLUE}OK"
+fi
 
 
 echo -e "${BLUE}Configuring the kernel"

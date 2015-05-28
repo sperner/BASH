@@ -35,7 +35,7 @@ cpuset()
 		MIN=$(cpupower -c $(seq -s, 0 $(expr $CORES - 1)) frequency-info|grep Grenzen|head -1|cut -d\  -f7)
 		MAX=$(cpupower -c $(seq -s, 0 $(expr $CORES - 1)) frequency-info|grep Grenzen|head -1|cut -d\  -f10)
 		[[ $(echo $MAX|grep '\.') ]]; MAX=$(echo $MAX|sed 's/\.//')0
-		[[ $(cat /sys/class/power_supply/BAT1/present) ]]; GOV=ondemand : GOV=powersave
+		[[ $(cat /sys/class/power_supply/BAT1/present) 2>/dev/null ]]; GOV=ondemand : GOV=powersave
 		#for ((NUM=0 ; NUM<=$CORES ; NUM++ )); do
 			sudo cpupower frequency-set -g ${1:-$GOV} --min ${2:-$MIN}MHz --max ${3:-$MAX}MHz #-c $NUM
 		#done

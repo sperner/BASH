@@ -36,6 +36,18 @@ then
 fi
 
 
+echo "Copying bash completion(s)"
+if [ ! -d ~/.bash_completion.d ]
+then
+	mkdir -v ~/.bash_completion.d
+fi
+
+if [ -d ~/.bash_completion.d/ ]
+then
+	cp -v *.bashcomp ~/.bash_completion.d/
+fi
+
+
 echo "Copying distribution specific"
 for distri in ${DISTROS}
 do

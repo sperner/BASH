@@ -11,20 +11,20 @@ if [[ $1 == "all" ]]
 then
 	if [ -d /etc/bash ]
 	then
-		echo "Copying global bashrc"
+		echo -e "\033[1;37m Copying global bashrc \033[0m"
 		sudo cp etc.bashrc /etc/bash/bashrc
 	fi
 fi
 
 
-echo "Copying bash files"
+echo -e "\033[1;37m Copying bash files \033[0m"
 for file in $(ls bash*)
 do
 	cp -v $file ~/.$file
 done
 
 
-echo "Copying some usefull scripts"
+echo -e "\033[1;37m Copying some usefull scripts \033[0m"
 if [ ! -d ~/.bin ]
 then
 	mkdir -v ~/.bin
@@ -36,7 +36,7 @@ then
 fi
 
 
-echo "Copying bash completion(s)"
+echo -e "\033[1;37m Copying bash completion(s) \033[0m"
 if [ ! -d ~/.bash_completion.d ]
 then
 	mkdir -v ~/.bash_completion.d
@@ -48,7 +48,7 @@ then
 fi
 
 
-echo "Copying distribution specific"
+echo -e "\033[1;37m Copying distribution specific \033[0m"
 for distri in ${DISTROS}
 do
 	if (cat /etc/os-release | grep -i $distri 2>&1 1>/dev/null)
@@ -57,3 +57,6 @@ do
 		cp -v xbash_login.$distri ~/.bash_login
 	fi
 done
+
+
+echo -e "\033[1;32m Installation completed,\033[0;32m have fun!\033[0m\n"

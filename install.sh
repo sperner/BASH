@@ -4,6 +4,9 @@
 #
 
 
+DISTROS="arch debian gentoo"
+
+
 if [[ $1 == "all" ]]
 then
 	if [ -d /etc/bash ]
@@ -32,3 +35,13 @@ then
 	cp -v {brightness,colors,dokernel,eedit,mute,revlookup,volume,wondershaper} ~/.bin/
 fi
 
+
+echo "Copying distribution specific"
+for distri in ${DISTROS}
+do
+	if (cat /etc/os-release | grep -i $distri 2>&1 1>/dev/null)
+	then
+		cp -v xbash_$distri ~/.bash_$distri
+		cp -v xbash_login.$distri ~/.bash_login
+	fi
+done

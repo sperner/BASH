@@ -1,0 +1,30 @@
+## Debian
+# Author: Sven Sperner <cethss@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+#Variables
+CORES=$(expr $(cat /proc/cpuinfo|grep processor|tail -1|cut -d\  -f2) + 1)
+
+#Aliases
+alias aall="sudo apt-get update && sudo apt-get upgrade"
+alias acheck="sudo apt-cache"
+alias aclean="sudo apt-get autoremove && sudo apt-get autoclean && sudo apt-get clean"
+alias ainstall="sudo apt-get install"
+alias alocalpkg="sudo dpkg -i"
+alias apurge="sudo apt-get remove --purge"
+alias aremove="sudo apt-get remove"
+alias asearch="apt-cache search"
+alias async="sudo apt-get update"
+alias aupdate="sudo apt-get upgrade"

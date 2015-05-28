@@ -239,15 +239,17 @@ chrootin()
 		echo -e "Bind virtual filesystems and change root"
 		echo -e "${RED}usage:${BLUE} chrootin() <directory>${nocol}"
 	else
-		sudo mount -t proc /proc $1/proc	|| { echo "$0: ${RED}Mounting /proc failed"; return -1; }
-		sudo mount --rbind /dev $1/dev		|| { echo "$0: ${RED}Mounting /dev failed"; return -1; }
-		sudo mount --rbind /sys $1/sys		|| { echo "$0: ${RED}Mounting /sys failed"; return -1; }
-		sudo chroot $1 /bin/bash		|| { echo "$0: ${RED}Changing root failed"; return -1; }
-		sudo umount $1/sys/fs/{fuse,cgroup}/*
-		sudo umount $1/sys/fs/cgroup
-		sudo umount $1/sys/kernel/debug
-		sudo umount $1/dev/{shm,mqueue,pts}
-		sudo umount $1/{dev,proc,sys}		|| { echo "$0: ${RED}Unmounting failed"; return -1; }
+		sudo mount -t proc /proc $1/proc	|| { echo "$0: ${RED}Mounting /proc failed"; }
+		sudo mount --rbind /dev $1/dev		|| { echo "$0: ${RED}Mounting /dev failed"; }
+		sudo mount --rbind /sys $1/sys		|| { echo "$0: ${RED}Mounting /sys failed"; }
+		sudo chroot $1 /bin/bash		|| { echo "$0: ${RED}Changing root failed"; }
+		for (( i=0 ; i<3 ; i++ ))
+		do
+			for folder in $(cat /proc/mounts | grep $1 | cut -d\  -f2)
+			do
+				sudo umount $folder		|| { echo "$0: ${RED}Unmounting $file failed"; }
+			done
+		done
 	fi
 }
 

@@ -1,0 +1,31 @@
+# Author: Sven Sperner <cethss@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+echo -e "\033[2J"
+echo -e "\033[H"
+#echo -e "\033[0;37m        $(date "+%A, %d-%m-%Y - %T %Z")"
+echo -e '\033[1;31m  \033[0m                         \033[1;31m      __'
+echo -e '\033[1;31m  \033[0m       `$$`         `$$` \033[1;31m     //\\\'
+echo -e '\033[1;31m  \033[0m        $$           $$  \033[1;31m     \\\//'
+echo -e '\033[1;31m  \033[0m        $$           $$  \033[0m     .__,        _         ' "\033[1;30m -------------------------------------------------"
+echo -e '\033[1;31m  \033[0m  ,d$$$g$$  ,d$$$b.  $$,d$$$b.`$$` g$$$$$b.`$$,d$$b.' "\033[1;30m|\033[0m OS:       \033[1;31m Debian\033[1;34m $(uname -s)"
+echo -e '\033[1;31m  \033[0m ,$P`  `$$ ,$P` `Y$. $$$`  `$$ $$  "`   `$$ $$$` `$$' "\033[1;30m|\033[0m Kernel:   \033[1;37m $(uname -r)"
+echo -e '\033[1;31m  \033[0m $$`    $$ $$`   `$$ $$`    $$ $$  ,ggggg$$ $$`   $$' "\033[1;30m|\033[0m Processor:\033[1;37m $(uname -p|sed 's/Genuine //g')"
+echo -e '\033[1;31m  \033[0m $$     $$ $$ggggg$$ $$     $$ $$ ,$P"   $$ $$    $$' "\033[1;30m|\033[0m Memory:   \033[1;37m $(cat /proc/meminfo | grep MemTotal | cut -d\  -f "9,10")"
+echo -e '\033[1;31m  \033[0m $$    ,$$ $$.       $$    ,$P $$ $$`   ,$$ $$    $$' "\033[1;30m|\033[0m Terminal: \033[1;37m $(tty)"
+echo -e '\033[1;31m  \033[0m `$g. ,$$$ `$$._ _., $$ _,g$P` $$ `$b. ,$$$ $$    $$' "\033[1;30m|\033[0m Hostname: \033[1;32m $(hostname)"
+echo -e '\033[1;31m  \033[0m  `Y$$P`$$. `Y$$$$P`,$$$$P"`  ,$$. `Y$$P`$$.$$.  ,$$.'
+echo -e "\033[0m"
+

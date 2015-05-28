@@ -1,0 +1,49 @@
+#!/bin/bash
+#
+# Check system health and take action, if needed
+# Author: Sven Sperner <cethss@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+LOGFILE=/var/log/health.log
+MLOGLEN=1000
+SERVICES="ftpd nfsd sshd vpnd webd"
+
+#echo "Checking system health @ `date`" >> $LOGFILE
+
+#cat /proc/loadavg >> $LOGFILE
+#df >> $LOGFILE
+#free >> $LOGFILE
+
+for service in ${SERVICES}
+do
+	if ! (kill -0 `pidof $service`)
+	then
+#		/etc/init.d/$service restart
+		systemctl restart $service
+		echo "$service restarted @ `date`" >> $LOGFILE
+#	else
+#		echo "$service is up & running" >> $LOGFILE
+	fi
+done
+
+#echo "System is healthy @ `date`" >> $LOGFILE
+
+if [ $(cat $LOGFILE|wc -l) -gt $MLOGLEN ]
+then
+	echo "Logfile got too big @ `date`" > $LOGFILE.old
+        tail -180 < $LOGFILE >> ${LOGFILE}.old
+        mv ${LOGFILE}.old $LOGFILE
+fi

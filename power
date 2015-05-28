@@ -1,0 +1,120 @@
+#!/bin/sh
+#
+# Enable & disable power saving features
+# Author: Sven Sperner <cethss@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+if [ "$1" == "performance" ]
+then
+
+	# Enable NMI watchdog
+	if [ -f /proc/sys/kernel/nmi_watchdog ]
+	then
+		echo 1 > /proc/sys/kernel/nmi_watchdog
+	fi
+
+	# Disable laptop mode
+	if [ -f /proc/sys/vm/laptop_mode ]
+	then
+		echo 0 > /proc/sys/vm/laptop_mode
+	fi
+
+	# Set PCI device power level:	always on
+	for device in /sys/bus/pci/devices/*/power/control
+	do
+		echo on > $device
+	done
+
+	# Set USB device power level:	always on
+	for device in /sys/bus/usb/devices/*/power/level
+	do
+		echo on > $device
+	done
+
+	# Set SATA host controller:	maximal performance
+	for device in /sys/class/scsi_host/host*/link_power_management_policy
+	do
+		echo max_performance > $device
+	done
+
+	# Set CPU frquency governor:	ondemand
+	for device in /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor
+	do
+		echo ondemand > $device
+	done 
+
+	# Disable HDAudio power saving
+	if [ -d /sys/module/snd_hda_intel/parameters ]
+	then
+		echo 0 > /sys/module/snd_hda_intel/parameters/power_save_controller
+		echo 0 > /sys/module/snd_hda_intel/parameters/power_save
+	fi
+
+else if [ "$1" == "powersave" ]
+     then
+
+	# Disable NMI watchdog
+	if [ -f /proc/sys/kernel/nmi_watchdog ]
+	then
+		echo 0 > /proc/sys/kernel/nmi_watchdog
+	fi
+
+	# Enable laptop mode
+	if [ -f /proc/sys/vm/laptop_mode ]
+	then
+		echo 5 > /proc/sys/vm/laptop_mode
+	fi
+
+	# Set PCI device power level:	autosuspend
+	for device in /sys/bus/pci/devices/*/power/control
+	do
+		echo auto > $device
+	done
+
+	# Set USB device power level:	autosuspend
+	for device in /sys/bus/usb/devices/*/power/level
+	do
+		if [ "$device" != "/sys/bus/usb/devices/9-1/power/level" ]
+		then
+			echo auto > $device
+		fi
+	done
+
+	# Set SATA host controller:	minimal powerusage
+	for device in /sys/class/scsi_host/host*/link_power_management_policy
+	do
+		echo min_power > $device
+	done
+
+	# Set CPU frquency governor:	powersave
+	for device in /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor
+	do
+		echo powersave > $device
+	done
+
+	# Enable HDAudio power saving
+	if [ -d /sys/module/snd_hda_intel/parameters ]
+	then
+		echo 1 > /sys/module/snd_hda_intel/parameters/power_save
+		echo 1 > /sys/module/snd_hda_intel/parameters/power_save_controller
+	fi
+
+     else
+	echo "usage: $0 <performance|powersave>"
+	exit 1
+     fi
+fi
+

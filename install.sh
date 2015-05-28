@@ -1,11 +1,24 @@
 #!/bin/sh
 #
 # Install script for bash stuff
+# Author: Sven Sperner <cethss@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
 
 DISTROS="arch debian gentoo"
-
 
 if [[ $1 == "all" ]]
 then
@@ -16,37 +29,31 @@ then
 	fi
 fi
 
-
 echo -e "\033[1;37m Copying bash files \033[0m"
 for file in $(ls bash*)
 do
 	cp -v $file ~/.$file
 done
 
-
 echo -e "\033[1;37m Copying some usefull scripts \033[0m"
 if [ ! -d ~/.bin ]
 then
 	mkdir -v ~/.bin
 fi
-
 if [ -d ~/.bin ]
 then
 	cp -v {brightness,colors,dokernel,eedit,mute,revlookup,volume,wondershaper} ~/.bin/
 fi
-
 
 echo -e "\033[1;37m Copying bash completion(s) \033[0m"
 if [ ! -d ~/.bash_completion.d ]
 then
 	mkdir -v ~/.bash_completion.d
 fi
-
 if [ -d ~/.bash_completion.d/ ]
 then
 	cp -v *.bashcomp ~/.bash_completion.d/
 fi
-
 
 echo -e "\033[1;37m Copying distribution specific \033[0m"
 for distri in ${DISTROS}
@@ -57,6 +64,5 @@ do
 		cp -v xbash_login.$distri ~/.bash_login
 	fi
 done
-
 
 echo -e "\033[1;32m Installation completed,\033[0;32m have fun!\033[0m\n"

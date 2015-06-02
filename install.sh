@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-
+#cat bash_functions | sed 's/sudo //g' > bash_function
 DISTROS="arch debian gentoo"
 SCRIPTS="brightness colors dokernel eedit healthchk mute power revlookup volume wondershaper"
 
@@ -25,14 +25,25 @@ then
 	if [ -d /etc/bash ]
 	then
 		echo -e "\033[1;37m Copying global bashrc \033[0m"
-		sudo cp etc.bashrc /etc/bash/bashrc
+		if [ $EUID -eq 0 ]
+		then
+			cp etc.bashrc /etc/bash/bashrc
+		else
+			sudo cp etc.bashrc /etc/bash/bashrc
+		fi
 	fi
 fi
 
 echo -e "\033[1;37m Copying bash files \033[0m"
 for file in $(ls bash*)
 do
-	cp -v $file ~/.$file
+	if [ $EUID -eq 0 ]
+	then
+		echo "$file -> ~/.$file, removed 'sudo'"
+		sed 's/sudo //g' $file > ~/.$file
+	else
+		cp -v $file ~/.$file
+	fi
 done
 
 echo -e "\033[1;37m Copying some usefull scripts \033[0m"
@@ -44,7 +55,13 @@ if [ -d ~/.bin ]
 then
 	for script in ${SCRIPTS}
 	do
-		cp -v $script ~/.bin/
+		if [ $EUID -eq 0 ]
+		then
+			echo "$script -> ~/.bin/$script, removed 'sudo'"
+			sed 's/sudo //g' $script > ~/.bin/$script
+		else
+			cp -v $script ~/.bin/
+		fi
 	done
 fi
 
@@ -63,7 +80,13 @@ for distri in ${DISTROS}
 do
 	if (cat /etc/os-release | grep -i $distri 2>&1 1>/dev/null)
 	then
-		cp -v xbash_$distri ~/.bash_$distri
+		if [ $EUID -eq 0 ]
+		then
+			echo "xbash_$distri -> ~/.bash_$distri, removed 'sudo'"
+			sed 's/sudo //g' xbash_$distri > ~/.bash_$distri
+		else
+			cp -v xbash_$distri ~/.bash_$distri
+		fi
 		cp -v xbash_login.$distri ~/.bash_login
 	fi
 done

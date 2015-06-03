@@ -320,6 +320,23 @@ killin()
 	fi
 }
 
+swapusage()
+{
+	if [ "$1" == "--help" ]; then
+		echo -e "Show swap usage by process"
+		echo -e "${RED}usage: ${BLUE}swapusage [<processname>]${nocol}" && return
+	fi
+	if [ $1 ]
+	then
+		cat /proc/$(pidof $1)/status | grep VmSwap
+	else
+		for file in /proc/*/status
+		do
+			awk '/VmSwap|Name/{printf $2 " " $3}END{ print ""}' $file 2>/dev/null
+		done | grep -v "0 kB" | grep kB | sort -k 2 -n -r 
+	fi
+}
+
 #workaround for not having 'gcore'
 #gcore()
 #{

@@ -81,6 +81,9 @@ alias mv='mv -iv'
 alias rm='rm -iv'
 alias mkdir='mkdir -v'
 alias rmdir='rmdir -v'
+alias chmod='chmod -v'
+alias chgrp='chgrp -v'
+alias chown='chown -v'
 
 #human readable
 alias df='df -Th'

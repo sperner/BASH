@@ -49,4 +49,4 @@ else
     VOLUME="${VOLUME}%"
 fi
 
-/usr/bin/notify-send "Volume Control" "$VOLUME" -i "$ICON" -t 1500
+notify-send "Volume Control" "$VOLUME" -i "$ICON" -t 1500

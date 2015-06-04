@@ -647,10 +647,10 @@ mountboot()
 netinfo ()
 {
 	echo "--------------- Network Information ---------------"
-	/sbin/ifconfig | awk /'inet Adr/ {print $2}'
-	/sbin/ifconfig | awk /'Bcast/ {print $3}'
-	/sbin/ifconfig | awk /'inet Adr/ {print $4}'
-	#/sbin/ifconfig | awk /'HWaddr/ {print $4,$5}'
+	ifconfig | awk /'inet Adr/ {print $2}'
+	ifconfig | awk /'Bcast/ {print $3}'
+	ifconfig | awk /'inet Adr/ {print $4}'
+	#ifconfig | awk /'HWaddr/ {print $4,$5}'
 	cat /etc/resolv.conf | awk /'nameserver/ {print $1,$2}'
 	echo "---------------------------------------------------"
 }
@@ -684,9 +684,9 @@ chmac()
 localip()
 {
 	[ $# -gt 0 ] && echo -e "Get IP adresses"
-#	MY_IP=$(/sbin/ifconfig ppp0 | awk '/inet/ { print $2 } ' | sed -e s/addr://)
-#	MY_ISP=$(/sbin/ifconfig ppp0 | awk '/P-t-P/ { print $3 } ' | sed -e s/P-t-P://)
-	MY_IP=$(/sbin/ifconfig eth0 | awk '/inet/ { print $2 } ' | sed -e s/addr://)
+#	MY_IP=$(ifconfig ppp0 | awk '/inet/ { print $2 } ' | sed -e s/addr://)
+#	MY_ISP=$(ifconfig ppp0 | awk '/P-t-P/ { print $3 } ' | sed -e s/P-t-P://)
+	MY_IP=$(ifconfig eth0 | awk '/inet/ { print $2 } ' | sed -e s/addr://)
 #	MY_ISP=$(pubip)
 	echo $MY_IP
 }

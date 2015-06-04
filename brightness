@@ -56,7 +56,7 @@ then
 			*)			VALUE=1;;		# else
 		esac
 	fi
-	gksu -u $(who|grep tty -m1|cut -d" " -f1) "/usr/bin/notify-send 'Brightness Control' 0x$VALUE -i $ICON -t 1500"
+	gksu -u $(who|grep tty -m1|cut -d" " -f1) "notify-send 'Brightness Control' 0x$VALUE -i $ICON -t 1500"
 	setpci -s $ADRESS F4.B=$(printf "%02x\n" $VALUE)
 else
 	setpci -s $ADRESS F4.B=30

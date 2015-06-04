@@ -9,12 +9,12 @@ depend() {
 
 start() {
         ebegin "Setting Display-Brightness"
-        /sbin/brightness
+        brightness
         eend $? "Unable to set Display-Brightness"
 }
 
 stop() { 
         ebegin "Setting Display-Brightness"
-        /sbin/brightness
+        brightness
         eend $? "Unable to set Display-Brightness"
 }

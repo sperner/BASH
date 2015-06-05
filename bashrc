@@ -29,6 +29,9 @@ fi
 # Include Gentoo specific Stuff
 [[ -f ~/.bash_gentoo ]] && . ~/.bash_gentoo
 
+# Include Debian specific Stuff
+[[ -f ~/.bash_debian ]] && . ~/.bash_debian
+
 # Include Arch specific Stuff
 [[ -f ~/.bash_arch ]] && . ~/.bash_arch
 

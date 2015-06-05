@@ -86,6 +86,24 @@ isNumeric()
 	fi
 }
 
+lowercase()
+{
+	if [ "$#" -lt 1 ]; then
+		echo -e "Change pattern(s) to lowercase"
+		echo -e "${RED}usage:${BLUE} lowercase() <filename-pattern>${nocol}" && return;
+	fi
+	for i in "$@"; do "`echo $i| tr [A-Z] [a-z]`" &>/dev/null; done
+}
+
+uppercase()
+{
+	if [ "$#" -lt 1 ]; then
+		echo -e "Change pattern(s) to uppercase"
+		echo -e "${RED}usage:${BLUE} uppercase() <filename-pattern>${nocol}" && return;
+	fi
+	for i in "$@"; do "`echo $i| tr [a-z] [A-Z]`" &>/dev/null; done
+}
+
 
 
 ## Daemon Functions
@@ -247,7 +265,7 @@ chrootin()
 		do
 			for folder in $(cat /proc/mounts | grep $1 | cut -d\  -f2)
 			do
-				sudo umount $folder		|| { echo "$0: ${RED}Unmounting $file failed"; }
+				sudo umount $folder 2>/dev/null	|| { echo "$0: ${RED}Unmounting $file failed"; }
 			done
 		done
 	fi
@@ -465,43 +483,23 @@ space2underscore()
 	for i in "$@"; do mv "$i" "`echo $i| tr ' ' '_'`" &>/dev/null; done
 }
 
-lowercase()  # move filenames to lowercase
+swapfiles()
 {
-	if [ "$#" -lt 1 ]; then
-		echo -e "Change filename(s) to lowercase"
-		echo -e "${RED}usage:${BLUE} lowercase() <filename-pattern>${nocol}" && return;
+	if [ "$#" -ne 2 ]; then
+		echo -e "Swap the names of two files/folders"
+		echo -e "${RED}usage:${BLUE} swapfiles() <file-/foldername> <file-/foldername>${nocol}" && return;
 	fi
-	for file ; do
-		filename=${file##*/}
-		case "$filename" in
-		*/*) dirname==${file%/*} ;;
-		*) dirname=.;;
-		esac
-		nf=$(echo $filename | tr A-Z a-z)
-		newname="${dirname}/${nf}"
-		if [ "$nf" != "$filename" ]; then
-			mv "$file" "$newname" && echo "lowercase: $file --> $newname"
-		else
-			echo "lowercase: $file not changed."
-		fi
-	done
-}
-
-swap()  # Swap 2 filenames around, if they exist
-{                #(from Uzi's bashrc).
-    local TMPFILE=tmp.$$ 
-    [ $# -ne 2 ] && echo -e "swap: 2 arguments needed" && return 1
-    [ ! -e $1 ] && echo -e "swap: $1 does not exist" && return 1
-    [ ! -e $2 ] && echo -e "swap: $2 does not exist" && return 1
-    mv "$1" $TMPFILE 
-    mv "$2" "$1"
-    mv $TMPFILE "$2"
+	[ ! -e $1 ] && echo -e "$1 does not exist" && return 1
+	[ ! -e $2 ] && echo -e "$2 does not exist" && return 1
+	mv "$1" "$1".tmp 
+	mv "$2" "$1"
+	mv "$1".tmp "$2"
 }
 
 filetop()
 {
 	if [ "$#" -lt 1 ]; then
-		echo -e "Change filename(s) to uppercase"
+		echo -e "Top like folder view"
 		echo -e "${RED}usage:${BLUE} filetop() <path>${nocol}" && return;
 	fi
 	watch -dn1 "df -h; ls -FlAth $1"
@@ -647,10 +645,11 @@ mountboot()
 netinfo ()
 {
 	echo "--------------- Network Information ---------------"
-	ifconfig | awk /'inet Adr/ {print $2}'
-	ifconfig | awk /'Bcast/ {print $3}'
-	ifconfig | awk /'inet Adr/ {print $4}'
-	#ifconfig | awk /'HWaddr/ {print $4,$5}'
+	ifconfig | awk '/inet / {print $1,$2}' | tail -1
+	ifconfig | awk '/broadcast/ {print $5,$6}'
+	ifconfig | awk '/inet / {print $3,$4}' | tail -1
+	ifconfig | awk '/ether/ {print $1,$2}' | tail -1
+	echo -n "gateway " && route | awk '/default/{print $2}'
 	cat /etc/resolv.conf | awk /'nameserver/ {print $1,$2}'
 	echo "---------------------------------------------------"
 }
@@ -658,15 +657,16 @@ netinfo ()
 hostinfo()
 {
 	[ $# -gt 0 ] && echo "Get current host related info"
-	echo -e "\n${YELLOW}You are logged on ${RED}$HOST"
+	echo -e "\n${YELLOW}You ($(whoami)) are logged on ${RED}$HOST"
 	echo -e "\n${RED}Current date :$NC ${BLUE}" ; datetime
-	echo -e "\n${RED}Temperatures:$NC ${BLUE}" ; sensors|grep C --color=never
+	echo -e "\n${RED}Temperatures:$NC ${BLUE}" ; sensors|grep "°C" --color=never
 	echo -e "\n${RED}Kernel information:$NC ${BLUE}" ; uname -a
 	echo -e "\n${RED}Users logged on:$NC ${BLUE}" ; w -h
 	echo -e "\n${RED}Machine stats :$NC ${BLUE}" ; uptime
 	echo -e "\n${RED}Memory stats :$NC ${BLUE}" ; free
-	localip 2>&- ;
+	localip 1>/dev/null
 	echo -e "\n${RED}Local IP Address :$NC ${BLUE}" ; echo ${MY_IP:-"Not connected"}
+	pubip 1>/dev/null
 	echo -e "\n${RED}ISP Address :$NC ${BLUE}" ; echo ${MY_ISP:-"Not connected"}
 	echo -e "\n${RED}Open connections :$NC ${BLUE}"; netstat -pan --inet;
 	echo -e "${nocol}"
@@ -683,18 +683,19 @@ chmac()
 
 localip()
 {
-	[ $# -gt 0 ] && echo -e "Get IP adresses"
+	[ $# -gt 0 ] && echo -e "Get local IP-Adress"
 #	MY_IP=$(ifconfig ppp0 | awk '/inet/ { print $2 } ' | sed -e s/addr://)
-#	MY_ISP=$(ifconfig ppp0 | awk '/P-t-P/ { print $3 } ' | sed -e s/P-t-P://)
-	MY_IP=$(ifconfig eth0 | awk '/inet/ { print $2 } ' | sed -e s/addr://)
-#	MY_ISP=$(pubip)
+#	MY_IP=$(ifconfig eth0 | awk '/inet/ { print $2 } ' | sed -e s/addr://)
+	MY_IP=$(ifconfig | awk '/inet / {print $2}' | tail -1)
 	echo $MY_IP
 }
 
 pubip()
 {
 	[ $# -gt 0 ] && echo -e "Get public IP-Address"
-	wget -q -O - checkip.dyndns.org|sed -e 's/.*Current IP Address: //' -e 's/<.*$//';
+#	MY_ISP=$(ifconfig ppp0 | awk '/P-t-P/ { print $3 } ' | sed -e s/P-t-P://)
+	MY_ISP=$(wget -q -O - checkip.dyndns.org|sed -e 's/.*Current IP Address: //' -e 's/<.*$//')
+	echo $MY_ISP
 }
 
 getserver()
@@ -712,7 +713,7 @@ respond()
 	curl -o /dev/null -w "Connect: %{time_connect} TTFB: %{time_starttransfer} Total time: %{time_total} \n" $1;
 }
 
-wdl()
+wgetdl()
 {
 	if [ "$#" -lt 1 ]; then
 		echo -e "Wget-Download"
@@ -778,10 +779,8 @@ translate()
 
 weather()
 {
-	[ $# -gt 0 ] && echo -e "Get weather-info"
-	declare -a WEATHERARRAY 
-	WEATHERARRAY=( `links -dump "http://www.google.com/search?hl=en&lr=&client=firefox-a&rls=org.mozilla%3Aen-US%3Aofficial&q=weather+60311&btnG=Search" | grep -A 5 -m 1 "Weather for" | grep -v "Add to "`) 
-	echo ${WEATHERARRAY[@]} 
+	[ $# -gt 0 ] && echo -e "Get weather-info for $1"
+	links -dump "http://www.google.com/search?hl=en&lr=&client=firefox-a&rls=org.mozilla%3Aen-US%3Aofficial&q=weather+${1:-"60311"}&btnG=Search" | grep -A 9 -m 1 "Weather for" | grep -v "Any time "
 }
 
 wiki()

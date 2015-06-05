@@ -22,6 +22,7 @@ alias ls='ls -h --color=auto --group-directories-first'	#->colorfull
 alias ll='ls -l'		#->list
 alias la='ls -a'		#->all
 alias lla='ls -la'		#->list all
+alias lh='ls -lh'		#->humanreadable
 alias lx='ls -lXB'		#->sort/extension
 alias lz='ls -lSr'		#->sort/size
 alias lt='ls -ltr'		#->sort/date
@@ -79,6 +80,7 @@ alias stail='cat /var/log/messages|tail'
 alias cp='cp -iv'
 alias mv='mv -iv'
 alias rm='rm -iv'
+alias ln='ln -v'
 alias mkdir='mkdir -v'
 alias rmdir='rmdir -v'
 alias chmod='chmod -v'
@@ -131,7 +133,6 @@ alias path='echo -e ${PATH//:/\\n}'
 alias libpath='echo -e ${LD_LIBRARY_PATH//:/\\n}'
 alias ldpath='echo $DYLD_LIBRARY_PATH | tr ":" "\n"'
 alias clpath='echo $CLASSPATH | tr ":" "\n"'
-#alias sudo='sudo '	#function seems to be better
 
 #watching
 alias wdf='watch df'

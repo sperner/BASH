@@ -20,7 +20,7 @@
 DISTROS="arch debian gentoo"
 SCRIPTS="brightness colors dokernel eedit healthchk mute power revlookup volume wondershaper"
 
-if [ $1 == "all" ]
+if [[ $1 == "all" ]]
 then
 	if [ -d /etc/bash ]
 	then

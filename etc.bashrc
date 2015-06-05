@@ -103,3 +103,5 @@ unset use_color safe_term match_lhs
 
 # Use Bash-Completion
 [[ -f /etc/profile.d/bash-completion.sh ]] && source /etc/profile.d/bash-completion.sh
+[[ -f /usr/share/bash-completion/bash_completion ]] && source /usr/share/bash-completion/bash_completion
+

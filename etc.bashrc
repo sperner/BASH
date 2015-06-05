@@ -75,22 +75,11 @@ if ${use_color} ; then
 		USERCOLOR='\[\033[01;32m\]';;
 	esac
 	PATHCOLOR='\[\033[01;34m\]'
+	ATCOLOR='\[\033[0;34m\]'
 	ENDCOLOR='\[\e[0m\]'
-
-	if [[ ${EUID} == 0 ]] ; then
-#		PS1='\[\033[01;31m\]\h\[\033[01;34m\] \W \$\[\033[00m\] '
-		PS1="$USERCOLOR\u@$HOSTCOLOR\h$PATHCOLOR \W \$ $ENDCOLOR"
-	else
-#		PS1='\[\033[01;32m\]\u@\h\[\033[01;34m\] \w \$\[\033[00m\] '
-		PS1="$USERCOLOR\u@$HOSTCOLOR\h$PATHCOLOR \w \$ $ENDCOLOR"
-	fi
+	PS1="$USERCOLOR\u$ATCOLOR@$HOSTCOLOR\h$PATHCOLOR \w \$ $ENDCOLOR"
 else
-	if [[ ${EUID} == 0 ]] ; then
-		# show root@ when we don't have colors
-		PS1='\u@\h \W \$ '
-	else
-		PS1='\u@\h \w \$ '
-	fi
+	PS1='\u@\h \w \$ '
 fi
 
 # Source globals

@@ -71,7 +71,7 @@ bu()
 	cp $1 ${1}-`date +%Y%m%d%H%M`.backup ;
 }
 
-isNumeric()
+isnumeric()
 {
 	if ! [[ "$1" =~ ^-*[0-9]+([.][0-9]+)?$ ]]
 	then

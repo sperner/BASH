@@ -62,15 +62,20 @@ if ${use_color} ; then
 	alias grep='grep --colour=auto'
 
 	# Enable variable, colorful prompt
-	if [[ "${DISPLAY}" != "" ]];
-	then    # local - green
-		HOSTCOLOR='\[\033[01;32m\]'
-	else
-		if [[ "${SSH_CLIENT}" != "" ]]
-		then    # remote ssh - yellow
-			HOSTCOLOR='\[\033[01;33m\]'
-		else    # remote - red
-			HOSTCOLOR='\[\033[01;31m\]'
+	if [[ $(tty) == "/dev/tty"[0-9]* ]]
+	then	# local terminal - cyan
+		HOSTCOLOR='\[\033[01;36m\]'
+	else	
+		if [[ "${DISPLAY}" != "" ]]
+		then	# local X terminal - green
+			HOSTCOLOR='\[\033[01;32m\]'
+		else
+			if [[ "${SSH_CLIENT}" != "" ]]
+			then	# remote ssh - yellow
+				HOSTCOLOR='\[\033[01;33m\]'
+			else	# remote? other - red
+				HOSTCOLOR='\[\033[01;31m\]'
+			fi
 		fi
 	fi
 	case $(id -u) in

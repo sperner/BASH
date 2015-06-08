@@ -38,9 +38,13 @@ fi
 # Include specific Stuff for modern systems
 [[ -f ~/.bash_higher ]] && . ~/.bash_higher
 
+
 export TIMEFORMAT=$'\nreal %3R\tuser %3U\tsys %3S\tpcpu %P\n'
 export HISTTIMEFORMAT="%H:%M > "
 export HISTIGNORE="&:bg:fg:ll:h"
+export HISTSIZE=1000
+export HISTFILESIZE=10000
+
 
 # Include Login-Script
 [[ -f ~/.bash_login ]] && . ~/.bash_login

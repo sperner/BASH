@@ -73,11 +73,11 @@ bu()
 	do
 		if [ -f $path ]
 		then
-			cp $path ${path}-`date +%Y%m%d%H%M`.backup
+			cp -iv $path ${path}-`date +%Y%m%d%H%M`.backup
 		fi
-		if [ -d $1 ]
+		if [ -d $path ]
 		then
-			tar cvpf ${path}-`date +%Y%m%d%H%M`.tar $path
+			tar cvpf ${path%/}-`date +%Y%m%d%H%M`.tar $path
 		fi
 	done
 }

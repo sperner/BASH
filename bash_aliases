@@ -70,6 +70,7 @@ alias dgrep='dmesg|grep -i'
 alias hgrep='history|grep'
 alias mgrep='cat /var/log/messages|grep -i'
 alias sgrep='cat /var/log/syslog|grep -i'
+alias xgrep='cat /var/log/Xorg.0.log|grep -i'
 
 #'tail'-magic
 alias dtail='dmesg|tail'
@@ -86,10 +87,12 @@ alias rmdir='rmdir -v'
 alias chmod='chmod -v'
 alias chgrp='chgrp -v'
 alias chown='chown -v'
+alias modprobe="modprobe -v"
 
 #human readable
 alias df='df -Th'
 alias du='du -h'
+alias free='free -h'
 alias datetime='date "+%A, %d-%m-%Y - %T %Z"'
 alias which='type -a'
 alias perm='stat --printf "%a %n \n"'

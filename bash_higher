@@ -63,6 +63,29 @@ cpuusage()
 
 
 
+## battery
+batstatus()
+{
+	FULLCUR=$(cat /sys/class/power_supply/BAT1/charge_full)
+	DESCUR=$(cat /sys/class/power_supply/BAT1/charge_full_design)
+	AKTCUR=$(cat /sys/class/power_supply/BAT1/charge_now)
+	MINVOLT=$(cat /sys/class/power_supply/BAT1/voltage_min_design)
+	AKTVOLT=$(cat /sys/class/power_supply/BAT1/voltage_now)
+	MANUF=$(cat /sys/class/power_supply/BAT1/manufacturer)
+	MODEL=$(cat /sys/class/power_supply/BAT1/model_name)
+	STATUS=$(cat /sys/class/power_supply/BAT1/status)
+	TECH=$(cat /sys/class/power_supply/BAT1/technology)
+	TYPE=$(cat /sys/class/power_supply/BAT1/type)
+	#echo $(cat /sys/class/power_supply/BAT1/uevent)
+
+	echo $MANUF - $MODEL is $STATUS
+	echo Type: $TECH $TYPE
+	echo Current Full: $FULLCUR nAh  -  Voltage Min: $MINVOLT nV
+	echo Current Now : $AKTCUR nAh  -  Voltage Now: $AKTVOLT nV
+}
+
+
+
 ## ethernet
 alias ntpdate='sudo ntpdate pool.ntp.org'
 alias scanlocal='nmap localhost -p0-65535'

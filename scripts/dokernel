@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # Configure, build & install Linux kernel
 # Author: Sven Sperner <cethss@gmail.com>

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # Change brightness of a Lenovo u350 display
 # Author: Sven Sperner <cethss@gmail.com>

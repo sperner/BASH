@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # Set Audio-Volume and Notify
 # Author: Sven Sperner <cethss@gmail.com>

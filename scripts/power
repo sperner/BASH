@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # Enable & disable power saving features
 # Author: Sven Sperner <cethss@gmail.com>

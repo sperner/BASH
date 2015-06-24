@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # Search for a query with google
 # Author: Sven Sperner <cethss@gmail.com>

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # DNS Reverse-Lookup
 # Author: Sven Sperner <cethss@gmail.com>

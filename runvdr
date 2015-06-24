@@ -1,0 +1,124 @@
+#!/bin/bash
+#
+# Run the vdr as an application
+# Author: Sven Sperner <cethss@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+export LANG=de_DE.utf8
+export LC_COLLATE=de_DE.utf8
+export VDR_CHARSET_OVERRIDE=ISO-8859-15
+
+XdontBLANK="false"
+
+VDR="/usr/bin/vdr"
+RESTARTonCRASH="false"
+
+DVBMODULES="b2c2_flexcop_pci b2c2_flexcop cx24120"
+LOADatSTARTUP="false"
+RELOADonCRASH="false"
+
+OPTS="--user=vdr --log=1 --watchdog=60 --chartab=ISO8859-15"
+
+DIRS=" \
+	--config='/etc/vdr' \
+	--cachedir='/var/cache/vdr' \
+	--video='/var/vdr/video' \
+	--record='/usr/share/vdr/bin/vdrrecord-gate.sh' \
+	--shutdown='/usr/share/vdr/bin/vdrshutdown-gate.sh'"
+PLUGS=" \
+	--plugin='softhddevice -a plug:ladcomp -p plug:ladcomp -d :0.0 -f -v vdpau -w no-hw-decoder' \
+	--plugin='skinnopacity' \
+	--plugin='sc' \
+	--plugin='epgsearch --config /etc/vdr/plugins/epgsearch' \
+	--plugin='osdteletext  --directory /var/cache/vdr/osdteletext -n 20' \
+	--plugin='vodcatcher' \
+	--plugin='mplayer -m /usr/share/vdr/mplayer/bin/mount-mplayer.sh -M /usr/share/vdr/mplayer/bin/mplay.sh' \
+	--plugin='femon' \
+	--plugin='tvscraper'"
+
+#--plugin=skinsoppalusikka -l /usr/share/vdr/channel-logos
+#--plugin=wirbelscan
+#--plugin=admin -d /etc/vdr/plugins/admin
+#--plugin=clock
+#--plugin=live -i 127.0.0.1
+#--plugin=osdpip
+#--plugin=streamdev-server -r /usr/share/vdr/streamdev/externremux.sh
+#--plugin=xineliboutput --local=none --remote=37890
+#--plugin=text2skin
+
+VDRCMD="$VDR $OPTS $DIRS $PLUGS $*"
+
+KILL="/usr/bin/killall -q -TERM"
+
+
+ModulesLoaded()
+{
+	for module in ${DVBMODULES}
+	do
+		sudo lsmod|grep $module 2>&1 1>/dev/null || return -1
+	done
+	return 0
+}
+
+LoadModules()
+{
+	sudo modprobe -i ${DVBMODULES} 2>&1 1>/dev/null && return 0 || return -1
+}
+
+UnloadModules()
+{
+	sudo modprobe -r ${DVBMODULES} 2>&1 1>/dev/null && return 0 || return -1
+}
+
+
+if ( $LOADatSTARTUP )
+then
+	if ! ModulesLoaded; then
+		LoadModules
+	fi
+fi
+
+if ( $XdontBLANK )
+then
+	xset -dpms && xset s 0 0
+fi
+
+while ( true )
+do
+	eval "$VDRCMD" 2>&1 1>/dev/null
+
+	if test $? -eq 0 -o $? -eq 2
+	then
+		exit
+	else
+		echo "`date` VDR terminated"
+		if ( $RESTARTonCRASH )
+		then
+			$KILL $VDR 2>&1 1>/dev/null
+			if ( $RELOADonCRASH )
+			then
+				echo -n "`date` reloading DVB Modules  ...  "
+				UnloadModules
+				LoadModules
+				echo "[OK]"
+			fi
+			echo "`date` restarting VDR"
+		else
+			echo "You can enable automatic restart,"
+			echo "by setting RESTARTonCRASH to true"
+			exit
+		fi
+	fi
+done

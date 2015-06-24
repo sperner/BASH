@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #Variables
-. .bash_vars
+. ~/.bash_vars
 
 #Aliases
 alias pall="sudo pacman -Suy"

@@ -16,9 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-#cat bash_functions | sed 's/sudo //g' > bash_function
+
 DISTROS="arch debian gentoo"
-SCRIPTS="brightness colors dokernel eedit healthchk mute power revlookup volume wondershaper"
 
 if [[ $1 == "all" ]]
 then
@@ -63,7 +62,7 @@ then
 fi
 if [ -d ~/.bin ]
 then
-	for script in ${SCRIPTS}
+	for script in $(find scripts/*)
 	do
 		if [ $EUID -eq 0 ]
 		then

@@ -66,9 +66,20 @@ bu()
 {
         if [ "$#" -lt 1 ]; then
                 echo -e "Backup a file (append date to name)"
-                echo -e "${RED}usage:${BLUE} bu() <filepath>${nocol}" && return;
+		echo -e " or a folder. (archive with date)"
+                echo -e "${RED}usage:${BLUE} bu() <path>${nocol}" && return;
         fi
-	cp $1 ${1}-`date +%Y%m%d%H%M`.backup ;
+	for path in $@
+	do
+		if [ -f $path ]
+		then
+			cp $path ${path}-`date +%Y%m%d%H%M`.backup
+		fi
+		if [ -d $1 ]
+		then
+			tar cvpf ${path}-`date +%Y%m%d%H%M`.tar $path
+		fi
+	done
 }
 
 isnumeric()

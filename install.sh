@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # Install script for bash stuff
 # Author: Sven Sperner <cethss@gmail.com>
@@ -66,8 +66,9 @@ then
 	do
 		if [ $EUID -eq 0 ]
 		then
-			echo "$script -> ~/.bin/$script, removed 'sudo'"
-			sed 's/sudo //g' $script > ~/.bin/$script
+			file=$(echo $script|cut -d/ -f2)
+			echo "$script -> ~/.bin/$file, removed 'sudo'"
+			sed 's/sudo //g' $script > ~/.bin/$file
 		else
 			cp -v $script ~/.bin/
 		fi

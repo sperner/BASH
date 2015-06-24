@@ -15,8 +15,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #Variables
+. .bash_vars
 ekey='ACCEPT_KEYWORDS="~x86"'
-CORES=$(expr $(cat /proc/cpuinfo|grep processor|tail -1|cut -d\  -f2) + 1)
 export EIX_LIMIT=0
 
 #Aliases

@@ -1,4 +1,4 @@
-## Debian
+## Variables
 # Author: Sven Sperner <cethss@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
@@ -14,17 +14,17 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#Variables
-. .bash_vars
+## spec's
+CORES=$(expr $(cat /proc/cpuinfo|grep processor|tail -1|cut -d\  -f2) + 1)
+TFTRES=1920x1080
+CAMRES=1920x1080
+CAMDEV=/dev/video0
+#DVBDEV=/dev/dvb/adapter0/
 
-#Aliases
-alias aall="sudo apt-get update && sudo apt-get upgrade"
-alias acheck="sudo apt-cache"
-alias aclean="sudo apt-get autoremove && sudo apt-get autoclean && sudo apt-get clean"
-alias ainstall="sudo apt-get install"
-alias alocalpkg="sudo dpkg -i"
-alias apurge="sudo apt-get remove --purge"
-alias aremove="sudo apt-get remove"
-alias asearch="apt-cache search"
-alias async="sudo apt-get update"
-alias aupdate="sudo apt-get upgrade"
+HOMENET=192.168.0.0
+HOMEMASK=255.255.255.0
+VDRADDR=192.168.0.
+VDRUSER=vdr
+SERVERADDR=192.168.0.
+SERVERUSER=admin
+

@@ -14,18 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-## spec's
-CORES=$(expr $(cat /proc/cpuinfo|grep processor|tail -1|cut -d\  -f2) + 1)
-TFTRES=1920x1080
-CAMRES=1920x1080
-CAMDEV=/dev/video0
-
-HOMENET=192.168.0.0
-HOMEMASK=255.255.255.0
-VDRADDR=192.168.0.
-VDRUSER=vdr
-SERVERADDR=192.168.0.
-SERVERUSER=admin
+#Variables
+. .bash_vars
 
 ## CPU
 cpuset()

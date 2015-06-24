@@ -18,6 +18,7 @@
 . .bash_vars
 ekey='ACCEPT_KEYWORDS="~x86"'
 export EIX_LIMIT=0
+export DISTCC_DIR="/var/tmp/portage/.distcc"
 
 #Aliases
 alias eall="sudo emerge -av --update --deep --newuse --with-bdeps=y @system @world"
@@ -52,7 +53,7 @@ alias erevdep="sudo revdep-rebuild -- -av"
 alias esearch="sudo emerge --search"
 alias esize="equery size"
 alias eskip="sudo emerge --resume --skip-first"
-alias esync="sudo layman -s ALL && sudo eix-sync"
+alias esync="sudo emerge --sync -A && sudo eix-update"
 alias eunmask="sudo autounmask"
 alias eupdate="sudo emerge -av --update"
 alias eupdeep="sudo emerge -av --update --deep"

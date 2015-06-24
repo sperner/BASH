@@ -1,0 +1,23 @@
+#!/bin/sh
+#
+#
+
+url="www.google.de/search?q="
+cbrowser="links -driver fb"
+xbrowser="chromium"
+link=$url
+
+for arg in $*
+do
+	if [ "$link" == "$url" ]
+	then
+		link="$link$arg"
+	else
+		link="$link+$arg"
+	fi
+done
+
+case "$TERM" in
+	"linux")	$cbrowser "$link";;
+	"xterm")	$xbrowser "$link";;
+esac

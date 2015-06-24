@@ -62,14 +62,14 @@ cyanun='\e[4;36m'		# Cyan
 greyun='\e[4;37m'		# Grey
 whiteun='\e[4;38m'		# White
 
-blackbk='\e[40m'  		# Black	- Background
-redbk='\e[41m'  		# Red
-greenbk='\e[42m'  		# Green
-yellowbk='\e[43m'  		# Yellow
-bluebk='\e[44m'  		# Blue
-purplebk='\e[45m'  		# Purple
-cyanbk='\e[46m'  		# Cyan
-whitebk='\e[47m'  		# White
+blackbk='\e[40m'		# Black	- Background
+redbk='\e[41m'			# Red
+greenbk='\e[42m'		# Green
+yellowbk='\e[43m'		# Yellow
+bluebk='\e[44m'			# Blue
+purplebk='\e[45m'		# Purple
+cyanbk='\e[46m'			# Cyan
+whitebk='\e[47m'		# White
 
-txtreset='\e[0m'   		# Text Reset
+txtreset='\e[0m'		# Text Reset
 nocol='\e[0m'			# No Color

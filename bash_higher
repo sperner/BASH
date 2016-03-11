@@ -485,6 +485,8 @@ vboxmods()
 
 
 ## SSH/SCP... Functions
+alias vgrep='sudo cat /var/log/vdr.log|grep -i'
+alias vtail='sudo cat /var/log/vdr.log|tail'
 alias vdrmount="mountsshfs root@$VDRADDR:/"
 alias vdrmountstuff="mountsshfs $VDRUSER@$VDRADDR:/home/$VDRUSER/stuff"
 

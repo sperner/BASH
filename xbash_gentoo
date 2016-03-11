@@ -63,6 +63,12 @@ alias eupnew="sudo emerge -av --update --deep --newuse"
 alias euses="equery uses"
 alias unmerge="sudo emerge -av --unmerge"
 
+#Logmonitoring
+alias ggrep='sudo cat /var/log/grsec.log|grep -i'
+alias pgrep='sudo cat /var/log/pax.log|grep -i'
+alias gtail='sudo cat /var/log/grsec.log|tail'
+alias ptail='sudo cat /var/log/pax.log|tail'
+
 #Functions
 emanifest()
 {

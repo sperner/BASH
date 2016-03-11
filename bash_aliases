@@ -66,16 +66,23 @@ alias doit='make clean && make all'
 alias doprogram='make clean && make all && make program'
 
 #'grep'-magic
-alias dgrep='dmesg|grep -i'
-alias hgrep='history|grep'
-alias mgrep='cat /var/log/messages|grep -i'
-alias sgrep='cat /var/log/syslog|grep -i'
-alias xgrep='cat /var/log/Xorg.0.log|grep -i'
+alias cgrep='sudo cat /var/log/cron.log|grep -i'
+alias dgrep='sudo cat /var/log/daemon.log|grep -i'
+alias hgrep='cat ~/.bash_history|grep -i'
+alias igrep='sudo cat /var/log/iptables.log|grep -i'
+alias kgrep='sudo cat /var/log/kern.log|grep -i'
+alias mgrep='sudo cat /var/log/messages|grep -i'
+alias sgrep='sudo cat /var/log/syslog|grep -i'
+alias xgrep='sudo cat /var/log/Xorg.0.log|grep -i'
 
 #'tail'-magic
-alias dtail='dmesg|tail'
-alias mtail='cat /var/log/messages|tail'
-alias stail='cat /var/log/messages|tail'
+alias ctail='sudo cat /var/log/cron.log|tail'
+alias dtail='sudo cat /var/log/daemon.log|tail'
+alias itail='sudo cat /var/log/iptables.log|tail'
+alias ktail='sudo cat /var/log/kern.log|tail'
+alias mtail='sudo cat /var/log/messages|tail'
+alias stail='sudo cat /var/log/syslog|tail'
+alias xtail='sudo cat /var/log/Xorg.0.log|tail'
 
 #save overwrite & verbose output
 alias cp='cp -iv'

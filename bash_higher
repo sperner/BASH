@@ -89,7 +89,7 @@ batstatus()
 ## ethernet
 alias ntpdate='sudo ntpdate pool.ntp.org'
 alias scanlocal='nmap localhost -p0-65535'
-alias scanhome='nmap $HOMENET/$HOMEMASK -sP'
+alias scanhome='nmap $HOMENET/$HOMEPREFIX -sP'
 
 ether2wlan()
 {

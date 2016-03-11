@@ -69,7 +69,6 @@ alias doprogram='make clean && make all && make program'
 alias cgrep='sudo cat /var/log/cron.log|grep -i'
 alias dgrep='sudo cat /var/log/daemon.log|grep -i'
 alias hgrep='cat ~/.bash_history|grep -i'
-alias igrep='sudo cat /var/log/iptables.log|grep -i'
 alias kgrep='sudo cat /var/log/kern.log|grep -i'
 alias mgrep='sudo cat /var/log/messages|grep -i'
 alias sgrep='sudo cat /var/log/syslog|grep -i'
@@ -78,7 +77,6 @@ alias xgrep='sudo cat /var/log/Xorg.0.log|grep -i'
 #'tail'-magic
 alias ctail='sudo cat /var/log/cron.log|tail'
 alias dtail='sudo cat /var/log/daemon.log|tail'
-alias itail='sudo cat /var/log/iptables.log|tail'
 alias ktail='sudo cat /var/log/kern.log|tail'
 alias mtail='sudo cat /var/log/messages|tail'
 alias stail='sudo cat /var/log/syslog|tail'
@@ -110,6 +108,9 @@ alias ping='ping -c 3'
 #'slocate'
 alias slocup='sudo slocate -U /'
 
+#memory
+alias memusage='ps -eo command,size --sort -size|grep -v ' 0''
+
 #comfort fileoperations
 alias rscp='rsync -aP --inplace --no-whole-file'
 alias rsmv='rscp --remove-source-files'
@@ -134,8 +135,10 @@ alias netstatpid="netstat -tlnp"
 alias netstatapps="netstat -lantp | grep -i stab | awk -F/ '{print $2}' | sort | uniq"
 
 #'iptables'
+alias igrep='sudo cat /var/log/iptables.log|grep -i'
 alias iptstat='sudo iptables -L -v'
 alias iptsave='sudo /etc/init.d/iptables save'
+alias itail='sudo cat /var/log/iptables.log|tail'
 alias conntrack='sudo cat /proc/net/ip_conntrack'
 
 #pathes

@@ -23,14 +23,16 @@ export DISTCC_DIR="/var/tmp/portage/.distcc"
 #Aliases
 alias eall="sudo emerge -av --update --deep --newuse --with-bdeps=y @system @world"
 alias ebelong="equery belongs"
+alias ebuildpkg="sudo emerge -av --buildpkg"
 alias echeck="equery check"
 alias echanges="equery changes"
-alias eclean="sudo emerge -av --clean"
+alias ecleanresume="sudo emaint cleanresume -f"
 alias econfig="sudo emerge -av --config"
 alias edepclean="sudo emerge --ask --deep --depclean"
 alias edepends="equery depends"
 alias edepgraph="equery depgraph"
 alias edeselect="sudo emerge -av --deselect"
+alias edistclean="sudo eclean distfiles"
 alias eetcup="sudo etc-update"
 alias efiles="equery files"
 alias glsa="sudo glsa-check -p affected"
@@ -53,7 +55,7 @@ alias erevdep="sudo revdep-rebuild -- -av"
 alias esearch="sudo emerge --search"
 alias esize="equery size"
 alias eskip="sudo emerge --resume --skip-first"
-alias esync="sudo emerge --sync -A && sudo eix-update"
+alias esync="sudo eix-sync"
 alias eunmask="sudo autounmask"
 alias eupdate="sudo emerge -av --update"
 alias eupdeep="sudo emerge -av --update --deep"
@@ -88,18 +90,18 @@ emake()
 	then
 		if [ $1 == 'system' ]
 		then
-			#sudo emerge --emptytree --ask --verbose --quiet --jobs=$CORES --accept-properties=-interactive system
-			sudo emerge --emptytree --ask --verbose --quiet --jobs=$CORES --accept-properties=-interactive @system
+			#sudo emerge --emptytree --ask --verbose --quiet --jobs=$[$CORES/2] --accept-properties=-interactive system --with-bdeps=Y
+			sudo emerge --emptytree --ask --verbose --quiet --jobs=$[$CORES/2] --accept-properties=-interactive @system --with-bdeps=Y
 		fi
 		if [ $1 == 'world' ]
 		then
-			#sudo emerge --emptytree --ask --verbose --quiet --jobs=$CORES --accept-properties=-interactive world
-			sudo emerge --emptytree --ask --verbose --quiet --jobs=$CORES --accept-properties=-interactive @world
+			#sudo emerge --emptytree --ask --verbose --quiet --jobs=$[$CORES/2] --accept-properties=-interactive world --with-bdeps=Y
+			sudo emerge --emptytree --ask --verbose --quiet --jobs=$[$CORES/2] --accept-properties=-interactive @world --with-bdeps=Y
 		fi
 		if [ $1 == 'all' ]
 		then
-			#sudo emerge --emptytree --ask --verbose --quiet --jobs=$CORES --accept-properties=-interactive system world
-			sudo emerge --emptytree --ask --verbose --quiet --jobs=$CORES --accept-properties=-interactive @system @world
+			#sudo emerge --emptytree --ask --verbose --quiet --jobs=$[$CORES/2] --accept-properties=-interactive system world --with-bdeps=Y
+			sudo emerge --emptytree --ask --verbose --quiet --jobs=$[$CORES/2] --accept-properties=-interactive @system @world --with-bdeps=Y
 		fi
 	else
 		echo "Rebuild the System/World/both"
@@ -116,18 +118,18 @@ efullupdate()
 	sudo eix-sync
 	
 	#upgrade System
-	#sudo emerge --verbose --quiet --jobs=$CORES --keep-going --update --deep --newuse system world
-	sudo emerge --verbose --quiet --jobs=$CORES --keep-going --update --deep --newuse @system @world
+	#sudo emerge --verbose --quiet --jobs=$[$CORES/2] --keep-going --update --deep --newuse system world --with-bdeps=Y
+	sudo emerge --verbose --quiet --jobs=$[$CORES/2] --keep-going --update --deep --newuse @system @world --with-bdeps=Y
 	
 	#clean Unneeded
 	sudo emerge --verbose --quiet --keep-going --deep --depclean
 	
 	#fix Librarys
 	sudo lafilefixer --justfixit
-	sudo revdep-rebuild -- --verbose --quiet --jobs=$CORES --keep-going
+	sudo revdep-rebuild -- --verbose --quiet --jobs=$[$CORES/2] --keep-going
 	
 	#merge Preserved
-	#sudo emerge --verbose --quiet --jobs=$CORES --keep-going  @preserved-rebuild
+	#sudo emerge --verbose --quiet --jobs=$[$CORES/2] --keep-going  @preserved-rebuild
 	
 	#update Configs
 	sudo etc-update

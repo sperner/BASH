@@ -109,7 +109,7 @@ alias ping='ping -c 3'
 alias slocup='sudo slocate -U /'
 
 #memory
-alias memusage='ps -eo command,size --sort -size|grep -v ' 0''
+alias memusage="ps -eo command,size --sort -size|grep -v ' 0'"
 
 #comfort fileoperations
 alias rscp='rsync -aP --inplace --no-whole-file'

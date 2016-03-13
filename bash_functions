@@ -602,7 +602,7 @@ mountiso()
 		echo -e "Mount an ISO-Imagefile to /media/iso"
 		echo -e "${RED}usage:${BLUE} mountiso() <iso-file>${nocol}" && return;
 	fi
-	mount -o loop -t iso9660 $1 /media/iso && echo -e "${BLUE}$0: ${blue}$1 mounted${nocol}"
+	sudo mount -o loop -t iso9660 $1 /media/iso && echo -e "${BLUE}$0: ${blue}$1 mounted${nocol}"
 }
 
 mountimg()
@@ -611,7 +611,27 @@ mountimg()
 		echo -e "Mount an Imagefile (HD,...) to /media/img"
 		echo -e "${RED}usage:${BLUE} mountimg() <img-file>${nocol}" && return;
 	fi
-	mount -o loop $1 /media/img && echo -e "${BLUE}$0: ${blue}$1 mounted${nocol}"
+	sudo mount -o loop $1 /media/img && echo -e "${BLUE}$0: ${blue}$1 mounted${nocol}"
+}
+
+mountoffimg()
+{
+	if [ $# -lt 2 ]
+	then
+		echo -e "Mount a Partition of a DiscImage (HD,...) to /media/img"
+	        echo -e "${RED}usage:${BLUE} mountoffimg() <image> <partition|-l [help]>${nocol}" && return
+	fi
+
+	if [ $2 == '-l' ]
+	then
+	        fdisk -l $1
+		return
+	fi
+
+	ssize=$(fdisk -l $1 | egrep -i "Sektorgröße|Sectorsize" | awk '{$1=""; print $3}')
+	start=$(fdisk -l $1 | grep -i $2 | awk '{$1=""; print $2}')
+
+	sudo mount -v -o offset=$(( $start * $ssize )) $1 /media/img && echo -e "${BLUE}$0: ${blue}$1:$2 mounted${nocol}"
 }
 
 mountnfs()
